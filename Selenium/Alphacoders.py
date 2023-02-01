@@ -1,26 +1,30 @@
-import undetected_chromedriver.v2 as ChromeDriver
-from selenium import webdriver
+import undetected_chromedriver.v2 as chrome_driver
+from selenium.webdriver import ChromeOptions
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from time import sleep
 
-options = webdriver.ChromeOptions()
+options = ChromeOptions()
 options.add_argument("--incognito")
+driver = chrome_driver.Chrome(options=options)
 
-driver = ChromeDriver.Chrome(options=options)
 
-test_url = "https://wall.alphacoders.com/"
+# waiting with functions. Fleshing out the script to find where functions are needed or can be reused.
+def open_page(url: str):
+    driver.get(url)
 
-driver.get(test_url)
 
-print(driver.title)
-sleep(5)
+def search_with_bar(search_str: str):
+    search_bar = driver.find_element(by=By.NAME, value="search")
+    search_bar.send_keys(search_str, Keys.RETURN)
 
-search_bar = driver.find_element(by=By.CSS_SELECTOR, value=".input-lg")
-search_button = driver.find_element(by=By.CSS_SELECTOR, value=".btn-lg")
-search_bar.send_keys("Testing stuffs")
-sleep(5)
-search_button.click()
-sleep(20)
-print(driver.title)
 
-driver.quit()
+def find_element_with_css(css_str: str):
+    pass
+
+
+if __name__ == "__main__":
+    open_page("https://wall.alphacoders.com/")
+    search_with_bar("For academic purposes only")
+    sleep(5)
+    driver.quit()
