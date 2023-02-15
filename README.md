@@ -1,6 +1,6 @@
 # SkolaTestautomation
 
-Test automation av sidan https://wall.alphacoders.com/
+Test automation av sidan https://www.kjell.com/se
 
 Att göra; 
 
@@ -9,10 +9,17 @@ Att göra;
 		Filtrering/Sökning
 			Olika kategorier
 			Sökfunktioner
-		Nerladdning
+		Lägga till i kundkorg
+			Kontroller av kundkorg
+				Summa
+				Varor
+				Ändra antal varor
+				Uppdateras rätt
 	
 	
 	Extra:
 		Inloggning
-		Ladda upp filer
+			Testa inlogg m.m.
+				Begränsningar
+				hitta fel?
 		
