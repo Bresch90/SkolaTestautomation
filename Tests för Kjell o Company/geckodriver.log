@@ -1,0 +1,32 @@
+1676475575503	geckodriver	INFO	Listening on 127.0.0.1:14608
+1676476587241	geckodriver	INFO	Listening on 127.0.0.1:15096
+1676476846915	geckodriver	INFO	Listening on 127.0.0.1:15266
+1676477445239	geckodriver	INFO	Listening on 127.0.0.1:16053
+1676477448274	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "--marionette" "--remote-debugging-port" "16054" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "C:\\Users\\Alex\\AppData\\Local\\Temp\\rust_mozprofileYCt1Z1"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1676477448585	Marionette	INFO	Marionette enabled
+Dynamically enable window occlusion 0
+1676477448590	Marionette	INFO	Listening on port 16062
+Read port: 16062
+WebDriver BiDi listening on ws://127.0.0.1:16054
+1676477448740	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at C:\\Users\\Alex\\AppData\\Local\\Temp\\rust_mozprofileYCt1Z1\\search.json.mozlz4", (void 0)))
+DevTools listening on ws://127.0.0.1:16054/devtools/browser/af4df3d1-d1ac-4f09-b374-b49f7273f67f
+1676477451551	Marionette	INFO	Stopped listening on port 16062
+Dynamically enable window occlusion 1
+1676477666862	geckodriver	INFO	Listening on 127.0.0.1:16210
+1676477669869	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "--marionette" "--remote-debugging-port" "16211" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "C:\\Users\\Alex\\AppData\\Local\\Temp\\rust_mozprofilevjtaEw"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1676477670097	Marionette	INFO	Marionette enabled
+Dynamically enable window occlusion 0
+1676477670100	Marionette	INFO	Listening on port 16220
+Read port: 16220
+WebDriver BiDi listening on ws://127.0.0.1:16211
+1676477670215	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at C:\\Users\\Alex\\AppData\\Local\\Temp\\rust_mozprofilevjtaEw\\search.json.mozlz4", (void 0)))
+DevTools listening on ws://127.0.0.1:16211/devtools/browser/0aec817e-8ed8-4c9b-a25d-732a73768f8e
+1676477672839	Marionette	INFO	Stopped listening on port 16220
+Dynamically enable window occlusion 1
+JavaScript error: resource://gre/modules/UrlClassifierListManager.jsm, line 693: TypeError: this.tablesData[table] is undefined
