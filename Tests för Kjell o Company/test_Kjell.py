@@ -29,37 +29,42 @@ def driver(request):
     driver.quit()
 
 
-class TestKjell:
-    def wait_and_click(self, active_driver, path):
-        WebDriverWait(active_driver, timeout=5).until(lambda d: d.find_element(By.XPATH, path))
-        element = active_driver.find_element(By.XPATH, path)
-        element.click()
+def wait_and_click(active_driver, path):
+    WebDriverWait(active_driver, timeout=5).until(lambda d: d.find_element(By.XPATH, path))
+    element = active_driver.find_element(By.XPATH, path)
+    element.click()
 
+
+def wait_and_get_element(active_driver, path):
+    WebDriverWait(active_driver, timeout=5).until(lambda d: d.find_element(By.XPATH, path))
+    return active_driver.find_element(By.XPATH, path)
+
+
+class TestKjell:
     def test_open_homepage(self, driver):
         driver.get(HOMEPAGE)
-        assert "Kjell" in driver.title
+        assert "kjell" in driver.title.lower()
 
     def test_search_bar(self, driver):
         driver.get(HOMEPAGE)
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("test", Keys.RETURN)
-        # wait for new page to load
-        WebDriverWait(driver, timeout=5).\
-            until(lambda d: d.find_element(By.XPATH, "//div[2]/div[1]/div/div[1]/a/div[2]/h3"))
-        assert driver.find_element(By.XPATH, "//h3[contains(., 'Kabeltestare')]")
+
+        # get product from search results
+        example_element = wait_and_get_element(driver, "//h3[contains(., 'Kabeltestare')]")
+        assert example_element
 
     def test_choose_store(self, driver):
         driver.get(HOMEPAGE)
         driver.maximize_window()  # menu button has different path if screen is too small.
-        self.wait_and_click(driver, "//div[3]/div/button")  # menu button
-        self.wait_and_click(driver, "//nav/div/div[9]/div")  # choose store
-        self.wait_and_click(driver, "//li[contains(.,'Kalmar')]")  # select store
-        self.wait_and_click(driver, "//div[2]/div/div[5]/button")  # accept store
-        self.wait_and_click(driver, "//div[3]/div/button[1]")  # menu button
+        wait_and_click(driver, "//div[3]/div/button")  # menu button
+        wait_and_click(driver, "//nav/div/div[9]/div")  # choose store
+        wait_and_click(driver, "//li[contains(.,'Kalmar')]")  # select store
+        wait_and_click(driver, "//div[2]/div/div[5]/button")  # accept store
+        wait_and_click(driver, "//div[3]/div/button[1]")  # menu button
 
         # check chosen store
-        WebDriverWait(driver, timeout=5).until(lambda d: d.find_element(By.XPATH, "//nav/div/div[9]/div[1]/div/div[2]"))
-        chosen_store = driver.find_element(By.XPATH, "//nav/div/div[9]/div[1]/div/div[2]")
+        chosen_store = wait_and_get_element(driver, "//nav/div/div[9]/div[1]/div/div[2]")
         assert "kalmar" in chosen_store.text.lower()
 
 
