@@ -1106,3 +1106,69 @@ console.warn: LoginRecipes: "Falling back to a synchronous message for: https://
 JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
 1676489352284	Marionette	INFO	Stopped listening on port 5140
 Dynamically enable window occlusion 1
+1676535843123	geckodriver	INFO	Listening on 127.0.0.1:3474
+1676535846147	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "--marionette" "--remote-debugging-port" "3475" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "C:\\Users\\Alex\\AppData\\Local\\Temp\\rust_mozprofileVGB4Nq"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1676535846453	Marionette	INFO	Marionette enabled
+Dynamically enable window occlusion 0
+1676535846457	Marionette	INFO	Listening on port 3482
+Read port: 3482
+WebDriver BiDi listening on ws://127.0.0.1:3475
+1676535846613	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at C:\\Users\\Alex\\AppData\\Local\\Temp\\rust_mozprofileVGB4Nq\\search.json.mozlz4", (void 0)))
+DevTools listening on ws://127.0.0.1:3475/devtools/browser/ed9ca9cd-9808-4d9e-899c-9902f8734eea
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+console.warn: LoginRecipes: "Falling back to a synchronous message for: https://www.kjell.com."
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+1676535858555	Marionette	INFO	Stopped listening on port 3482
+Dynamically enable window occlusion 1
+1676535926883	geckodriver	INFO	Listening on 127.0.0.1:3534
+1676535929905	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "--marionette" "--remote-debugging-port" "3535" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "C:\\Users\\Alex\\AppData\\Local\\Temp\\rust_mozprofiletl8wch"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1676535930218	Marionette	INFO	Marionette enabled
+Dynamically enable window occlusion 0
+1676535930221	Marionette	INFO	Listening on port 3542
+WebDriver BiDi listening on ws://127.0.0.1:3535
+Read port: 3542
+1676535930430	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at C:\\Users\\Alex\\AppData\\Local\\Temp\\rust_mozprofiletl8wch\\search.json.mozlz4", (void 0)))
+DevTools listening on ws://127.0.0.1:3535/devtools/browser/e52f83c6-c10c-4070-acc2-686b3a36e986
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+console.warn: LoginRecipes: "Falling back to a synchronous message for: https://www.kjell.com."
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+1676535937283	Marionette	INFO	Stopped listening on port 3542
+Dynamically enable window occlusion 1
+1676538469130	geckodriver	INFO	Listening on 127.0.0.1:3785
+1676538472165	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "--marionette" "--remote-debugging-port" "3786" "--remote-allow-hosts" "localhost" "-no-remote" "-profile" "C:\\Users\\Alex\\AppData\\Local\\Temp\\rust_mozprofileQQ3ehI"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+1676538472492	Marionette	INFO	Marionette enabled
+Dynamically enable window occlusion 0
+1676538472495	Marionette	INFO	Listening on port 3794
+Read port: 3794
+WebDriver BiDi listening on ws://127.0.0.1:3786
+1676538472628	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at C:\\Users\\Alex\\AppData\\Local\\Temp\\rust_mozprofileQQ3ehI\\search.json.mozlz4", (void 0)))
+DevTools listening on ws://127.0.0.1:3786/devtools/browser/95f23782-b6d8-4a54-8904-c70c034204c3
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+console.warn: LoginRecipes: "Falling back to a synchronous message for: https://www.kjell.com."
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+1676538479808	Marionette	INFO	Stopped listening on port 3794
+Dynamically enable window occlusion 1

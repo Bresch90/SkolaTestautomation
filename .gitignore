@@ -2,3 +2,5 @@
 /.idea/
 /Tests för Kjell o Company/__pycache__/
 /Tests för Kjell o Company/.pytest_cache/
+/.pytest_cache/
+*.log
