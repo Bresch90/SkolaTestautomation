@@ -17,11 +17,11 @@ jobs:
         with:
           python-version: '3.10'
           
-        steps:
-          - uses: abhi1693/setup-browser@v0.3.4
-            with:
-              browser: chrome
-              version: latest
+      - name: Set up Chrome
+        uses: abhi1693/setup-browser@v0.3.4
+        with:
+          browser: chrome
+          version: latest
         
       - name: Install the necessary packages
         run: pip install selenium pytest
