@@ -20,16 +20,19 @@ def driver(request):
             from selenium.webdriver.chrome.options import Options
             options = Options()
             options.add_argument('--headless')
+            options.add_argument("--window-size=1920,1080")
             driver = webdriver.Chrome(options=options)
         case "firefox":
             from selenium.webdriver.firefox.options import Options
             options = Options()
             options.add_argument('--headless')
+            options.add_argument("--window-size=1920,1080")
             driver = webdriver.Firefox(options=options)
         case "edge":
             from selenium.webdriver.edge.options import Options
             options = Options()
             options.add_argument('--headless')
+            options.add_argument("--window-size=1920,1080")
             driver = webdriver.Edge(options=options)
         case _:
             raise ValueError(f"Bad input from --browser variable [{browser}]. Did you misspell it?")
@@ -44,7 +47,7 @@ def wait_and_click(active_driver, path):
 
 
 def wait_and_get_element(active_driver, path):
-    return WebDriverWait(active_driver, timeout=5).until(ec.visibility_of_element_located((By.XPATH, path)))
+    return WebDriverWait(active_driver, timeout=5).until(ec.element_to_be_clickable((By.XPATH, path)))
 
 
 def add_to_cart(active_driver):
@@ -104,7 +107,6 @@ class TestKjell:
         product_positions = [2, 2, 2, 2, 2, 4, 7, 22, 15, 12, 14, 13, 11]
 
         driver.get(HOMEPAGE)
-        driver.maximize_window()
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("test", Keys.RETURN)
         # wait for element on left side to load
@@ -115,7 +117,7 @@ class TestKjell:
             driver.execute_script("arguments[0].scrollIntoView();",
                                   driver.find_element(By.XPATH, f"//div[1]/div/div[{pos}]/a"))
             wait_and_click(driver, f"//div[1]/div/div[{pos}]/a")
-
+            print(f"\ngoing on {pos=}")
             name = wait_and_get_element(driver, f"//section[1]/div[1]/h1").text
             if name not in item_names_list:
                 item_names_list.append(name)
