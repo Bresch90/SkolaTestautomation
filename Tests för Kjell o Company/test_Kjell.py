@@ -17,7 +17,10 @@ def driver(request):
     browser = request.config.getoption('--browser').lower()
     match browser:
         case "chrome":
-            driver = webdriver.Chrome()
+            from selenium.webdriver.chrome.options import Options
+            options = Options()
+            options.add_argument('--headless')
+            driver = webdriver.Chrome(chrome_options=options)
         case "firefox":
             driver = webdriver.Firefox()
         case "edge":
