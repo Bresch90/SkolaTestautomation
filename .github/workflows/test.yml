@@ -1,0 +1,27 @@
+# .github/workflows/test.yaml
+name: testerino
+on:
+  push:
+    branches: [ "main" ]
+    
+    
+jobs:
+  testing_using_selenium:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@v2
+     #Setup Python   
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+          
+      - name: Install Webbrowsers
+        run: sudo apt-get install -y chromium-browser
+        
+      - name: Install the necessary packages
+        run: pip install selenium pytest
+        
+      - name: Run the PytTest script
+        run: pytest -s --tb=short --browser=chrome .\\"Tests för Kjell o Company"\test_Kjell.py
