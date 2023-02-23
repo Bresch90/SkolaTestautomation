@@ -6,23 +6,39 @@ on:
     
     
 jobs:
-  testing_using_selenium:
+  
+  run_tests:
     runs-on: ubuntu-latest
     steps:
       - name: Check out this repo
-        uses: actions/checkout@v2
-     #Setup Python   
+        uses: actions/checkout@v3
+      
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-          
-      - name: Setup Chrome
-        uses: browser-actions/setup-chrome@v1.1.0
-
         
       - name: Install the necessary packages
         run: pip install selenium pytest
+
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1.1.0
+      
+      - name: Setup Firefox
+        uses: browser-actions/setup-firefox@v1
+      
+      - name: Setup Edge
+        run: sudo apt update && sudo apt install microsoft-edge-stable
+
+
+      - name: Run Chrome tests
+        if: success() || failure()
+        run: pytest -s --tb=short --browser=chrome ./"Tests för Kjell o Company"/test_Kjell.py
+
+      - name: Run Firefox tests
+        if: success() || failure()
+        run: pytest -s --tb=short --browser=firefox ./"Tests för Kjell o Company"/test_Kjell.py
         
-      - name: Run the PytTest script
-        run: pytest -s --tb=short ./"Tests för Kjell o Company"/test_Kjell.py
+      - name: Run Edge tests
+        if: success() || failure()
+        run: pytest -s --tb=short --browser=edge ./"Tests för Kjell o Company"/test_Kjell.py
