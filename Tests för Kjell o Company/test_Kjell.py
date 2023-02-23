@@ -19,6 +19,7 @@ def driver(request):
         case "chrome":
             from selenium.webdriver.chrome.options import Options
             options = Options()
+
             options.add_argument('--headless')
             driver = webdriver.Chrome(chrome_options=options)
         case "firefox":
