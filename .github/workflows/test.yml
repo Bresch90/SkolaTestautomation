@@ -24,4 +24,4 @@ jobs:
         run: pip install selenium pytest
         
       - name: Run the PytTest script
-        run: pytest -s --tb=short --browser=chrome .\\"Tests för Kjell o Company"\test_Kjell.py
+        run: pytest -s --tb=short .\\"Tests för Kjell o Company"\test_Kjell.py
