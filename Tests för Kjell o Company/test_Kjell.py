@@ -19,13 +19,18 @@ def driver(request):
         case "chrome":
             from selenium.webdriver.chrome.options import Options
             options = Options()
-
             options.add_argument('--headless')
-            driver = webdriver.Chrome(chrome_options=options)
+            driver = webdriver.Chrome(options=options)
         case "firefox":
-            driver = webdriver.Firefox()
+            from selenium.webdriver.firefox.options import Options
+            options = Options()
+            options.add_argument('--headless')
+            driver = webdriver.Firefox(options=options)
         case "edge":
-            driver = webdriver.Edge()
+            from selenium.webdriver.edge.options import Options
+            options = Options()
+            options.add_argument('--headless')
+            driver = webdriver.Edge(options=options)
         case _:
             raise ValueError(f"Bad input from --browser variable [{browser}]. Did you misspell it?")
 
