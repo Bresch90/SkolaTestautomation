@@ -131,10 +131,9 @@ class TestKjell:
         for pos in product_positions:
             wait_and_click(driver, f"//div[1]/div/div[{pos}]/a")  # click on product
             logging.info(f"\ngoing on {pos=}")
-            sleep(1)
+            # sleep(1)
             # name = wait_and_get_element(driver, f"//div[4]/section[1]/div[1]/h1").text
             name = wait_and_get_element(driver, f"//div[1]/h1").text
-
             # wait for addToCart or "Bevaka" button
             WebDriverWait(driver, timeout=30).until(lambda d:
                                                     d.find_elements(By.XPATH, "//*[@id='addToCart']")
