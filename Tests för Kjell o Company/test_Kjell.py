@@ -193,7 +193,11 @@ class TestKjell:
         logging.info(f"{item_names_list=}")
         logging.info(f"{prices_dict}")
         for item in item_names_list:
-            assert item in items_in_cart
+            item_was_found = False
+            for item_in_cart in items_in_cart:
+                if item in item_in_cart:
+                    break
+            assert item_was_found
 
         assert f"{sum(prices_dict.values()):.1f}" == f"{total_cart_site:.1f}"  # string to format floating point error
 
