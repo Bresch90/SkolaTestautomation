@@ -162,7 +162,9 @@ class TestKjell:
             price = float(wait_and_get_element(driver,
                                                f'//div/span/span')
                           .text.replace(':-', '').replace(' ', ''))  # some contain ":-" and spaces
-            if driver.find_elements(By.XPATH, f"//section[1]/div[2]/div[2]/span/span/sup"):
+            # looking for both sup on mobile layout and normal
+            if driver.find_elements(By.XPATH, f"//section[1]/div[2]/div[2]/span/span/sup") or \
+                    driver.find_elements(By.XPATH, f"//div[3]/span/span/sup"):
                 price /= 100
                 logging.info(f"Found sup! for {name}")
             else:
