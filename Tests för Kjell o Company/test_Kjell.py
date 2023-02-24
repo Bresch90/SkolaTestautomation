@@ -147,7 +147,6 @@ class TestKjell:
             if name not in item_names_list:
                 item_names_list.append(name)
                 logging.info(f"added {name} to item_names_list")
-            driver.find_elements(By.XPATH, )
             price = float(wait_and_get_element(driver,
                                                f'//div/span/span')
                           .text.replace(':-', '').replace(' ', ''))  # some contain ":-" and spaces
