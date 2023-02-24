@@ -193,6 +193,7 @@ class TestKjell:
         items_in_cart = [e.text for e in driver.find_elements(By.XPATH, "//div[2]/div/ul/li/div[1]/div[1]/div/a")]
         logging.info(f"{items_in_cart=}")
         logging.info(f"{item_names_list=}")
+        logging.info(f"{prices_dict}")
         for item in item_names_list:
             assert item in items_in_cart
 
