@@ -20,10 +20,10 @@ logging.basicConfig(level=logging.INFO)
 def driver(request):
     global BROWSER, HEADLESS
     # needed a global variable since it can only be fetched once it seems.
-    # BROWSER = request.config.getoption('--browser').lower()
+    BROWSER = request.config.getoption('--browser').lower()
     HEADLESS = request.config.getoption('--headless').lower()
 
-    BROWSER = 'edge'
+    # BROWSER = 'edge'
     match BROWSER:
         case "chrome":
             from selenium.webdriver.chrome.options import Options
@@ -142,7 +142,8 @@ class TestKjell:
         wait_and_get_element(driver, "//div[2]/div/div[1]/div[1]/div[2]")
         # collect data on the products and add to cart
         for pos in product_positions:
-            wait_and_click(driver, f"//div[1]/div/div[{pos}]/a", max_fails=10)  # click on product
+            # click on product
+            wait_and_click(driver, f"//div[1]/div/div[{pos}]/a", max_fails=30)  # max_fails because edge in jenkins
             logging.info(f"\ngoing on {pos=}")
             name = wait_and_get_element(driver, f"//div[1]/h1").text
             # wait for addToCart or "Bevaka" button
