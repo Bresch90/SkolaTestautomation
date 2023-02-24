@@ -53,21 +53,23 @@ def driver(request):
     driver.quit()
 
 
-def wait_and_click(active_driver, path):
+def wait_and_click(active_driver, path, center_scroll=True):
     # wait for element to be available if needed.
     element = WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
     # move_to_element action doesn't scroll on firefox, had to use javascript instead.
     active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
-    active_driver.execute_script("window.scrollBy(0, -640);")  # center on screen after scroll.
+    if center_scroll:
+        active_driver.execute_script("window.scrollBy(0, -540);")  # center on screen after scroll.
     ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
 
 
-def wait_and_get_element(active_driver, path):
+def wait_and_get_element(active_driver, path, center_scroll=True):
     # wait for element to be available if needed.
     element = WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
     # move_to_element action doesn't scroll on firefox, had to use javascript instead.
     active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
-    active_driver.execute_script("window.scrollBy(0, -640);")  # center on screen after scroll.
+    if center_scroll:
+        active_driver.execute_script("window.scrollBy(0, -540);")  # center on screen after scroll.
     return element
 
 
@@ -167,7 +169,7 @@ class TestKjell:
 
         # open cart
         wait_and_click(driver, "//button[@data-test-id='cart-button']")
-        total_cart_site = wait_and_get_element(driver, "//div[2]/div[2]/div/span/span")\
+        total_cart_site = wait_and_get_element(driver, "//div[2]/div[2]/div/span/span", center_scroll=False)\
             .text.replace(' ', '').replace(':', '')  # get total from cart and format string
 
         "/html/body/div[1]/div[1]/div/div[6]/div[2]/div/div/div[2]/div/div[2]/div[2]/div/span/span"
