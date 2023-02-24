@@ -20,10 +20,10 @@ logging.basicConfig(level=logging.INFO)
 def driver(request):
     global BROWSER, HEADLESS
     # needed a global variable since it can only be fetched once it seems.
-    BROWSER = request.config.getoption('--browser').lower()
+    # BROWSER = request.config.getoption('--browser').lower()
     HEADLESS = request.config.getoption('--headless').lower()
 
-    # BROWSER = 'edge'
+    BROWSER = 'edge'
     match BROWSER:
         case "chrome":
             from selenium.webdriver.chrome.options import Options
@@ -111,8 +111,8 @@ class TestKjell:
         wait_and_click(driver, "//li[contains(.,'Kalmar')]")  # select store
         wait_and_click(driver, "//button[@data-test-id='choose-store-button']")  # accept store
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']")  # menu button
-
         # check chosen store
+###### check this again
         sleep(5)
         chosen_store = wait_and_get_element(driver, "//nav/div/div[9]/div[1]/div/div[2]")
         # "/html/body/div[1]/div[1]/div/div[6]/div[2]/div/div/div/div[2]/nav/div/div[9]/div[1]/div/div[2]" # stor skärm
@@ -144,8 +144,6 @@ class TestKjell:
         for pos in product_positions:
             wait_and_click(driver, f"//div[1]/div/div[{pos}]/a", max_fails=10)  # click on product
             logging.info(f"\ngoing on {pos=}")
-            # sleep(1)
-            # name = wait_and_get_element(driver, f"//div[4]/section[1]/div[1]/h1").text
             name = wait_and_get_element(driver, f"//div[1]/h1").text
             # wait for addToCart or "Bevaka" button
             WebDriverWait(driver, timeout=30).until(lambda d:
@@ -166,6 +164,10 @@ class TestKjell:
                           .text.replace(':-', '').replace(' ', ''))  # some contain ":-" and spaces
             if driver.find_elements(By.XPATH, f"//section[1]/div[2]/div[2]/span/span/sup"):
                 price /= 100
+                logging.info(f"Found sup! for {name}")
+            else:
+                logging.info(f"Didn't find sup for {name}")
+
             if name in prices_dict:
                 prices_dict[name] = prices_dict[name] + price
             else:
