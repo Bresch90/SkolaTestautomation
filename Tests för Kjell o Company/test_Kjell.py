@@ -96,7 +96,10 @@ class TestKjell:
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']")  # menu button
 
         # check chosen store
+        sleep(5)
         chosen_store = wait_and_get_element(driver, "//nav/div/div[9]/div[1]/div/div[2]")
+        # "/html/body/div[1]/div[1]/div/div[6]/div[2]/div/div/div/div[2]/nav/div/div[9]/div[1]/div/div[2]" # stor skärm
+        # "/html/body/div[1]/div[1]/div/div[6]/div[2]/div/div/div/div[2]/nav/div/div[9]/div[1]/div/div[2]"
         assert "kalmar" in chosen_store.text.lower()
 
     @pytest.mark.skip(reason="test_search_exact: Not implemented on site. "
@@ -127,7 +130,9 @@ class TestKjell:
             wait_and_click(driver, f"//div[1]/div/div[{pos}]/a")  # click on product
             logging.info(f"\ngoing on {pos=}")
             sleep(1)
-            name = wait_and_get_element(driver, f"//div[4]/section[1]/div[1]/h1").text
+            # name = wait_and_get_element(driver, f"//div[4]/section[1]/div[1]/h1").text
+            name = wait_and_get_element(driver, f"//div[1]/h1").text
+
 
             # wait for addToCart or "Bevaka" button
             WebDriverWait(driver, timeout=10).until(lambda d:
