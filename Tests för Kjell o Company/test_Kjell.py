@@ -89,7 +89,7 @@ def wait_and_get_element(active_driver, path, center_scroll=True):
     if center_scroll:
         active_driver.execute_script("window.scrollBy(0, -500);")  # center on screen after scroll.
     # need to fetch element again since the page destroys some elements when scrolling.
-    # this fixed the assertion error with getting name beeing different.
+    # this fixed the assertion error with getting name being different on some browsers?
     return WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
 
 
@@ -113,7 +113,7 @@ class TestKjell:
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']")  # menu button
         # check chosen store
 ###### check this again
-        sleep(5)
+        # sleep(5)
         chosen_store = wait_and_get_element(driver, "//nav/div/div[9]/div[1]/div/div[2]")
         # "/html/body/div[1]/div[1]/div/div[6]/div[2]/div/div/div/div[2]/nav/div/div[9]/div[1]/div/div[2]" # stor skärm
         # "/html/body/div[1]/div[1]/div/div[6]/div[2]/div/div/div/div[2]/nav/div/div[9]/div[1]/div/div[2]"
@@ -133,8 +133,7 @@ class TestKjell:
     def test_add_to_cart(self, driver):
         item_names_list = []
         prices_dict = {}
-        # product_positions = [2, 2, 2, 2, 6, 4, 7, 22, 15, 12, 14, 13, 11]
-        product_positions = [2, 6, 7, 22]
+        product_positions = [2, 3, 2, 5, 6, 4, 7, 22, 15, 12, 14, 13, 11]
 
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("test", Keys.RETURN)
@@ -166,21 +165,10 @@ class TestKjell:
             # looking for both sup on mobile layout and normal
             if driver.find_elements(By.XPATH, f"//section[1]/div[2]/div[2]/span/span/sup") or \
                     driver.find_elements(By.XPATH, f"//div[3]/span/span/sup") or \
-                    driver.find_elements(By.XPATH, f"/html/body/div[1]/div[1]/div/div[4]/div/div[1]/div[1]/div[2]/span/span/sup"):
+                    driver.find_elements(By.XPATH,
+                                         f"/html/body/div[1]/div[1]/div/div[4]/div/div[1]/div[1]/div[2]/span/span/sup"):
                 # last one is because some elements behave wierd with path to sup...for example:
                 # https://www.kjell.com/se/produkter/el-verktyg/matinstrument/matsladdar-prober-kontakter/matsladdar/matsladdar-30-v-3-pack-p37842
-                "/html/body/div[1]/div[1]/div/div[4]/section[1]/div[2]/div[2]/span/span/sup"
-                "/html/body/div[1]/div[1]/div/div[4]/div/div[1]/div[1]/div[2]/span/span/sup"
-
-                "/html/body/div[1]/div[1]/div/div[4]/section[1]/div[2]/div[2]/span/span/sup" # stor röv
-                "/html/body/div[1]/div[1]/div/div[4]/div/div[1]/div[1]/div[2]/span/span/sup" # liten röv
-
-                "/html/body/div/div[1]/div/div[4]/section[1]/div[2]/div[2]/span/span/sup" # stor, semi normal
-                "/html/body/div/div[1]/div/div[4]/div/div[1]/div[1]/div[3]/span/span/sup" # liten semi normal
-
-                "/html/body/div/div[1]/div/div[4]/section[1]/div[2]/div[2]/span/span/sup" # stor normal
-                "/html/body/div/div[1]/div/div[4]/div/div[1]/div[1]/div[3]/span/span/sup" # liten normal
-
                 price /= 100
                 logging.info(f"Found sup! for {name}")
             else:
@@ -200,9 +188,6 @@ class TestKjell:
         total_cart_site = wait_and_get_element(driver, "//div[2]/div[2]/div/span/span", center_scroll=False)\
             .text.replace(' ', '').replace(':', '')  # get total from cart and format string
 
-        "/html/body/div[1]/div[1]/div/div[6]/div[2]/div/div/div[2]/div/div[2]/div[2]/div/span/span"
-        "/html/body/div[1]/div[1]/div/div[6]/div[2]/div/div/div[2]/div/div[2]/div[2]/div/span/span"
-
         if '-' in total_cart_site:
             total_cart_site = float(total_cart_site.replace('-', ''))
         else:
@@ -212,6 +197,9 @@ class TestKjell:
         logging.info(f"{items_in_cart=}")
         logging.info(f"{item_names_list=}")
         logging.info(f"{prices_dict}")
+
+        # TODO look into this
+        # ugly loops because sometimes it grabs the h1, name of item, from page before it opens the product page.
         for item in item_names_list:
             item_was_found = False
             for item_in_cart in items_in_cart:
@@ -219,6 +207,4 @@ class TestKjell:
                     item_was_found = True
                     break
             assert item_was_found
-
         assert f"{sum(prices_dict.values()):.1f}" == f"{total_cart_site:.1f}"  # string to format floating point error
-
