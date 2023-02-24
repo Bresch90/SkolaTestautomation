@@ -3,11 +3,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
+import logging
 import pytest
 from time import sleep
 
 HOMEPAGE = "https://www.kjell.com/se/"
-BROWSER = 'chrome'
+BROWSER = ''
+logging.basicConfig(level=logging.INFO)
 
 
 @pytest.fixture(autouse=True, scope='class')
@@ -15,6 +18,7 @@ def driver(request):
     global BROWSER
     # needed a global variable since it can only be fetched once it seems.
     BROWSER = request.config.getoption('--browser').lower()
+    # BROWSER = 'firefox'
     match BROWSER:
         case "chrome":
             from selenium.webdriver.chrome.options import Options
@@ -25,17 +29,18 @@ def driver(request):
         case "firefox":
             from selenium.webdriver.firefox.options import Options
             options = Options()
-            options.add_argument('--headless')
-            options.add_argument("--window-size=1920,1080")
+            # options.add_argument('--headless')
+            options.add_argument("--width=1920")
+            options.add_argument("--height=1080")
             driver = webdriver.Firefox(options=options)
         case "edge":
             from selenium.webdriver.edge.options import Options
             options = Options()
-            options.add_argument('--headless')
+            # options.add_argument('--headless')
             options.add_argument("--window-size=1920,1080")
             driver = webdriver.Edge(options=options)
         case _:
-            raise ValueError(f"Bad input from --browser variable [{browser}]. Did you misspell it?")
+            raise ValueError(f"Bad input from --browser variable [{BROWSER}]. Did you misspell it?")
 
     yield driver
     driver.delete_all_cookies()
@@ -43,19 +48,16 @@ def driver(request):
 
 
 def wait_and_click(active_driver, path):
-    WebDriverWait(active_driver, timeout=5).until(ec.element_to_be_clickable((By.XPATH, path))).click()
+    # wait for element to be available if needed.
+    element = WebDriverWait(active_driver, timeout=5).until(ec.element_to_be_clickable((By.XPATH, path)))
+    # move_to_element action doesn't scroll on firefox, had to use javascript instead.
+    active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
+    active_driver.execute_script("window.scrollBy(0, -540);")  # center on screen after scroll.
+    ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
 
 
 def wait_and_get_element(active_driver, path):
     return WebDriverWait(active_driver, timeout=5).until(ec.element_to_be_clickable((By.XPATH, path)))
-
-
-def add_to_cart(active_driver):
-    # add to cart
-    wait_and_click(active_driver, "//*[@id='addToCart']")
-    # close overlay window. Using javascript as the element animates and something captures the click
-    active_driver.execute_script("arguments[0].click();",
-                                 active_driver.find_element(By.XPATH, "//button[@data-test-id='recs-close-btn']"))
 
 
 class TestKjell:
@@ -76,7 +78,6 @@ class TestKjell:
 
     def test_choose_store(self, driver):
         driver.get(HOMEPAGE)
-        driver.maximize_window()  # menu button has different path if screen is too small.
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']")  # menu button
         wait_and_click(driver, "//div[@data-test-id='my-store-button']")  # choose store
         wait_and_click(driver, "//li[contains(.,'Kalmar')]")  # select store
@@ -91,7 +92,6 @@ class TestKjell:
                              "Does something with quotation but doesnt search for exact.")
     def test_search_exact(self, driver):
         driver.get(HOMEPAGE)
-        driver.maximize_window()  # menu button has different path if screen is too small.
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("\"test\"", Keys.RETURN)
 
@@ -103,7 +103,7 @@ class TestKjell:
     def test_add_to_cart(self, driver):
         item_names_list = []
         prices_dict = {}
-        product_positions = [2, 2, 2, 2, 2, 4, 7, 22, 15, 12, 14, 13, 11]
+        product_positions = [2, 2, 2, 2, 6, 4, 7, 22, 15, 12, 14, 13, 11]
 
         driver.get(HOMEPAGE)
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
@@ -112,14 +112,24 @@ class TestKjell:
         wait_and_get_element(driver, "//div[2]/div/div[1]/div[1]/div[2]")
         # collect data on the products and add to cart
         for pos in product_positions:
-            # scrolls to element as some are in the dom but cant be clicked.
-            driver.execute_script("arguments[0].scrollIntoView();",
-                                  driver.find_element(By.XPATH, f"//div[1]/div/div[{pos}]/a"))
-            wait_and_click(driver, f"//div[1]/div/div[{pos}]/a")
-            print(f"\ngoing on {pos=}")
+            wait_and_click(driver, f"//div[1]/div/div[{pos}]/a")  # click on product
+            logging.info(f"\ngoing on {pos=}")
             name = wait_and_get_element(driver, f"//section[1]/div[1]/h1").text
+
+            # wait for addToCart or "Bevaka" button
+            WebDriverWait(driver, timeout=5).until(lambda d:
+                                                   d.find_elements(By.XPATH, "//*[@id='addToCart']")
+                                                   or d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
+                                                   )
+            # check if item is out of stock
+            if driver.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]"):
+                logging.info(f"\n{name} {pos=} is not available for purchase, skipping it")
+                driver.back()
+                continue
+
             if name not in item_names_list:
                 item_names_list.append(name)
+                logging.info(f"added {name} to item_names_list")
             price = float(wait_and_get_element(driver, f"//section[1]/div[2]/div[2]/span/span")
                           .text.replace(':-', '').replace(' ', ''))  # some contain ":-" and spaces
 
@@ -131,7 +141,8 @@ class TestKjell:
             else:
                 prices_dict.update({name: price})
 
-            add_to_cart(driver)
+            wait_and_click(driver, "//*[@id='addToCart']")  # add item to cart
+            logging.info(f"cart should now be {item_names_list=}")
             driver.back()
 
         # open cart
@@ -141,12 +152,13 @@ class TestKjell:
         if '-' in total_cart_site:
             total_cart_site = float(total_cart_site.replace('-', ''))
         else:
-            total_cart_site = float(total_cart_site)/100  # correct if cents
+            total_cart_site = float(total_cart_site)/100  # correct if there are cents
 
-        items_in_cart = [e.text for e in driver.find_elements(By.XPATH, "//li/div[1]/div[1]/div/a")]
+        items_in_cart = [e.text for e in driver.find_elements(By.XPATH, "//div[2]/div/ul/li/div[1]/div[1]/div/a")]
+        logging.info(f"{items_in_cart=}")
+        logging.info(f"{item_names_list=}")
         for item in item_names_list:
             assert item in items_in_cart
 
-        # print(f"\n{prices_dict} {total_cart_site} {sum(prices_dict.values())}")
         assert f"{sum(prices_dict.values()):.1f}" == f"{total_cart_site:.1f}"  # string to format floating point error
 
