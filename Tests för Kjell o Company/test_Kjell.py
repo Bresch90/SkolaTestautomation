@@ -14,14 +14,14 @@ HEADLESS = ''
 logging.basicConfig(level=logging.INFO)
 
 
-@pytest.fixture(autouse=True, scope='class')
+@pytest.fixture(autouse=True, scope='function')
 def driver(request):
     global BROWSER, HEADLESS
     # needed a global variable since it can only be fetched once it seems.
     BROWSER = request.config.getoption('--browser').lower()
     HEADLESS = request.config.getoption('--headless').lower()
 
-    # BROWSER = 'firefox'
+    # BROWSER = 'edge'
     match BROWSER:
         case "chrome":
             from selenium.webdriver.chrome.options import Options
@@ -47,7 +47,9 @@ def driver(request):
             driver = webdriver.Edge(options=options)
         case _:
             raise ValueError(f"Bad input from --browser variable [{BROWSER}]. Did you misspell it?")
-
+    driver.get(HOMEPAGE)
+    # accept cookies as it obscures some options
+    wait_and_click(driver, "//div[3]/button[2]")
     yield driver
     driver.delete_all_cookies()
     driver.quit()
@@ -59,8 +61,9 @@ def wait_and_click(active_driver, path, center_scroll=True):
     # move_to_element action doesn't scroll on firefox, had to use javascript instead.
     active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
     if center_scroll:
-        active_driver.execute_script("window.scrollBy(0, -540);")  # center on screen after scroll.
-    ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
+        active_driver.execute_script("window.scrollBy(0, -500);")  # center on screen after scroll.
+    # ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
+    element.click()
 
 
 def wait_and_get_element(active_driver, path, center_scroll=True):
@@ -69,19 +72,15 @@ def wait_and_get_element(active_driver, path, center_scroll=True):
     # move_to_element action doesn't scroll on firefox, had to use javascript instead.
     active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
     if center_scroll:
-        active_driver.execute_script("window.scrollBy(0, -540);")  # center on screen after scroll.
+        active_driver.execute_script("window.scrollBy(0, -500);")  # center on screen after scroll.
     return element
 
 
 class TestKjell:
     def test_open_homepage(self, driver):
-        driver.get(HOMEPAGE)
         assert "kjell" in driver.title.lower()
 
     def test_search_bar(self, driver):
-        driver.get(HOMEPAGE)
-        # accept cookies as it obscures some options
-        wait_and_click(driver, "//div[3]/button[2]")
         search_bar = wait_and_get_element(driver, '//form/div[1]/input')
         search_bar.send_keys("test", Keys.RETURN)
 
@@ -90,7 +89,6 @@ class TestKjell:
         assert example_element
 
     def test_choose_store(self, driver):
-        driver.get(HOMEPAGE)
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']")  # menu button
         wait_and_click(driver, "//div[@data-test-id='my-store-button']")  # choose store
         wait_and_click(driver, "//li[contains(.,'Kalmar')]")  # select store
@@ -107,7 +105,6 @@ class TestKjell:
     @pytest.mark.skip(reason="test_search_exact: Not implemented on site. "
                              "Does something with quotation but doesnt search for exact.")
     def test_search_exact(self, driver):
-        driver.get(HOMEPAGE)
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("\"test\"", Keys.RETURN)
 
@@ -122,7 +119,6 @@ class TestKjell:
         # product_positions = [2, 2, 2, 2, 6, 4, 7, 22, 15, 12, 14, 13, 11]
         product_positions = [2, 6, 7, 22]
 
-        driver.get(HOMEPAGE)
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("test", Keys.RETURN)
         # wait for element on left side to load
