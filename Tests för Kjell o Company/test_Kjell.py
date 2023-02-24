@@ -55,19 +55,19 @@ def driver(request):
 
 def wait_and_click(active_driver, path):
     # wait for element to be available if needed.
-    element = WebDriverWait(active_driver, timeout=5).until(ec.element_to_be_clickable((By.XPATH, path)))
+    element = WebDriverWait(active_driver, timeout=10).until(ec.element_to_be_clickable((By.XPATH, path)))
     # move_to_element action doesn't scroll on firefox, had to use javascript instead.
     active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
-    active_driver.execute_script("window.scrollBy(0, -540);")  # center on screen after scroll.
+    active_driver.execute_script("window.scrollBy(0, -440);")  # center on screen after scroll.
     ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
 
 
 def wait_and_get_element(active_driver, path):
     # wait for element to be available if needed.
-    element = WebDriverWait(active_driver, timeout=5).until(ec.element_to_be_clickable((By.XPATH, path)))
+    element = WebDriverWait(active_driver, timeout=10).until(ec.element_to_be_clickable((By.XPATH, path)))
     # move_to_element action doesn't scroll on firefox, had to use javascript instead.
     active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
-    active_driver.execute_script("window.scrollBy(0, -540);")  # center on screen after scroll.
+    active_driver.execute_script("window.scrollBy(0, -440);")  # center on screen after scroll.
     return element
 
 
@@ -126,10 +126,10 @@ class TestKjell:
         for pos in product_positions:
             wait_and_click(driver, f"//div[1]/div/div[{pos}]/a")  # click on product
             logging.info(f"\ngoing on {pos=}")
-            name = wait_and_get_element(driver, f"//section[1]/div[1]/h1").text
+            name = wait_and_get_element(driver, f"//div[4]/section[1]/div[1]/h1").text
 
             # wait for addToCart or "Bevaka" button
-            WebDriverWait(driver, timeout=5).until(lambda d:
+            WebDriverWait(driver, timeout=10).until(lambda d:
                                                    d.find_elements(By.XPATH, "//*[@id='addToCart']")
                                                    or d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
                                                    )
