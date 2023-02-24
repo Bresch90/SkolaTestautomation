@@ -18,10 +18,10 @@ logging.basicConfig(level=logging.INFO)
 def driver(request):
     global BROWSER, HEADLESS
     # needed a global variable since it can only be fetched once it seems.
-    # BROWSER = request.config.getoption('--browser').lower()
+    BROWSER = request.config.getoption('--browser').lower()
     HEADLESS = request.config.getoption('--headless').lower()
 
-    BROWSER = 'edge'
+    # BROWSER = 'edge'
     match BROWSER:
         case "chrome":
             from selenium.webdriver.chrome.options import Options
@@ -63,7 +63,7 @@ def wait_and_click(active_driver, path, center_scroll=True):
     if center_scroll:
         active_driver.execute_script("window.scrollBy(0, -500);")  # center on screen after scroll.
     # ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
-    WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable(element)).click()
+    WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path))).click()
 
 
 def wait_and_get_element(active_driver, path, center_scroll=True):
@@ -73,7 +73,7 @@ def wait_and_get_element(active_driver, path, center_scroll=True):
     active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
     if center_scroll:
         active_driver.execute_script("window.scrollBy(0, -500);")  # center on screen after scroll.
-    return element
+    return WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
 
 
 class TestKjell:
