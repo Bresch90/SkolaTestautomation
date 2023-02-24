@@ -196,6 +196,7 @@ class TestKjell:
             item_was_found = False
             for item_in_cart in items_in_cart:
                 if item in item_in_cart:
+                    item_was_found = True
                     break
             assert item_was_found
 
