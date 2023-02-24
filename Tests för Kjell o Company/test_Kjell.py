@@ -67,7 +67,7 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=1):
             # move_to_element action doesn't scroll on firefox, had to use javascript instead.
             active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
             if center_scroll:
-                active_driver.execute_script("window.scrollBy(0, -500);")  # center on screen after scroll.
+                active_driver.execute_script("window.scrollBy(0, -450);")  # center on screen after scroll.
             # ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
             WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path))).click()
             stale_element = False
@@ -87,7 +87,7 @@ def wait_and_get_element(active_driver, path, center_scroll=True):
     # move_to_element action doesn't scroll on firefox, had to use javascript instead.
     active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
     if center_scroll:
-        active_driver.execute_script("window.scrollBy(0, -500);")  # center on screen after scroll.
+        active_driver.execute_script("window.scrollBy(0, -450);")  # center on screen after scroll.
     # need to fetch element again since the page destroys some elements when scrolling.
     # this fixed the assertion error with getting name being different on some browsers?
     return WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
