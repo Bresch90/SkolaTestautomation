@@ -63,7 +63,12 @@ def wait_and_click(active_driver, path):
 
 
 def wait_and_get_element(active_driver, path):
-    return WebDriverWait(active_driver, timeout=5).until(ec.element_to_be_clickable((By.XPATH, path)))
+    # wait for element to be available if needed.
+    element = WebDriverWait(active_driver, timeout=5).until(ec.element_to_be_clickable((By.XPATH, path)))
+    # move_to_element action doesn't scroll on firefox, had to use javascript instead.
+    active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
+    active_driver.execute_script("window.scrollBy(0, -540);")  # center on screen after scroll.
+    return element
 
 
 class TestKjell:
@@ -109,7 +114,8 @@ class TestKjell:
     def test_add_to_cart(self, driver):
         item_names_list = []
         prices_dict = {}
-        product_positions = [2, 2, 2, 2, 6, 4, 7, 22, 15, 12, 14, 13, 11]
+        # product_positions = [2, 2, 2, 2, 6, 4, 7, 22, 15, 12, 14, 13, 11]
+        product_positions = [2, 6, 7, 22]
 
         driver.get(HOMEPAGE)
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
@@ -153,13 +159,14 @@ class TestKjell:
 
         # open cart
         wait_and_click(driver, "//button[@data-test-id='cart-button']")
-        # get total from cart and format string
-        total_cart_site = wait_and_get_element(driver, "//div[2]/div/span/span").text.replace(' ', '').replace(':', '')
+        total_cart_site = wait_and_get_element(driver, "//div[2]/div[2]/div/span/span")\
+            .text.replace(' ', '').replace(':', '')  # get total from cart and format string
+
         if '-' in total_cart_site:
             total_cart_site = float(total_cart_site.replace('-', ''))
         else:
             total_cart_site = float(total_cart_site)/100  # correct if there are cents
-
+        wait_and_get_element(driver, "//div[2]/div/ul/li/div[1]/div[1]/div/a")  # make sure elements are in focus
         items_in_cart = [e.text for e in driver.find_elements(By.XPATH, "//div[2]/div/ul/li/div[1]/div[1]/div/a")]
         logging.info(f"{items_in_cart=}")
         logging.info(f"{item_names_list=}")
