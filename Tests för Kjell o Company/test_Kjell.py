@@ -57,9 +57,9 @@ def driver(request):
     driver.quit()
 
 
-def wait_and_click(active_driver, path, center_scroll=True):
+def wait_and_click(active_driver, path, center_scroll=True, max_fails=1):
     stale_element = True
-    counter_fails = 0
+    tries = 0
     while stale_element:
         try:
             # wait for element to be available if needed.
@@ -73,9 +73,11 @@ def wait_and_click(active_driver, path, center_scroll=True):
             stale_element = False
         except StaleElementReferenceException as e:
             logging.info("Element was stale! Trying again")
+            tries += 1
         except ElementClickInterceptedException as e:
             logging.info("Click was intercepted! Trying again")
-        if counter_fails > 10:
+            tries += 1
+        if tries > max_fails:
             raise selenium.common.exceptions.StaleElementReferenceException("Too many stale elements tries")
 
 
@@ -140,7 +142,7 @@ class TestKjell:
         wait_and_get_element(driver, "//div[2]/div/div[1]/div[1]/div[2]")
         # collect data on the products and add to cart
         for pos in product_positions:
-            wait_and_click(driver, f"//div[1]/div/div[{pos}]/a")  # click on product
+            wait_and_click(driver, f"//div[1]/div/div[{pos}]/a", max_fails=10)  # click on product
             logging.info(f"\ngoing on {pos=}")
             # sleep(1)
             # name = wait_and_get_element(driver, f"//div[4]/section[1]/div[1]/h1").text
@@ -162,10 +164,6 @@ class TestKjell:
             price = float(wait_and_get_element(driver,
                                                f'//div/span/span')
                           .text.replace(':-', '').replace(' ', ''))  # some contain ":-" and spaces
-            # "/html/body/div[1]/div[1]/div/div[4]/section[1]/div[2]/div[2]/span/span"
-            # "/html/body/div[1]/div[1]/div/div[4]/div/div[1]/div[1]/div[3]/span/span"
-            # '//span[contains(@class, "fn bu a1") AND contains(@class, "po j5")]'
-            # correcting cents(öre) being added as full price. If it has a /sup, its being corrected.
             if driver.find_elements(By.XPATH, f"//section[1]/div[2]/div[2]/span/span/sup"):
                 price /= 100
             if name in prices_dict:
