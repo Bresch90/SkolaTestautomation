@@ -10,33 +10,39 @@ from time import sleep
 
 HOMEPAGE = "https://www.kjell.com/se/"
 BROWSER = ''
+HEADLESS = ''
 logging.basicConfig(level=logging.INFO)
 
 
 @pytest.fixture(autouse=True, scope='class')
 def driver(request):
-    global BROWSER
+    global BROWSER, HEADLESS
     # needed a global variable since it can only be fetched once it seems.
     BROWSER = request.config.getoption('--browser').lower()
+    HEADLESS = request.config.getoption('--headless').lower()
+
     # BROWSER = 'firefox'
     match BROWSER:
         case "chrome":
             from selenium.webdriver.chrome.options import Options
             options = Options()
-            # options.add_argument('--headless')
+            if HEADLESS == 'true':
+                options.add_argument('--headless')
             options.add_argument("--window-size=1920,1080")
             driver = webdriver.Chrome(options=options)
         case "firefox":
             from selenium.webdriver.firefox.options import Options
             options = Options()
-            # options.add_argument('--headless')
+            if HEADLESS == 'true':
+                options.add_argument('--headless')
             options.add_argument("--width=1920")
             options.add_argument("--height=1080")
             driver = webdriver.Firefox(options=options)
         case "edge":
             from selenium.webdriver.edge.options import Options
             options = Options()
-            # options.add_argument('--headless')
+            if HEADLESS == 'true':
+                options.add_argument('--headless')
             options.add_argument("--window-size=1920,1080")
             driver = webdriver.Edge(options=options)
         case _:
