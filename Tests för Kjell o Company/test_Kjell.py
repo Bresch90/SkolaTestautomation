@@ -72,13 +72,13 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=1):
             WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path))).click()
             stale_element = False
         except StaleElementReferenceException as e:
-            logging.info("Element was stale! Trying again")
+            logging.warning("Element was stale! Trying again")
             tries += 1
         except ElementClickInterceptedException as e:
-            logging.info("Click was intercepted! Trying again")
+            logging.warning("Click was intercepted! Trying again")
             tries += 1
         if tries > max_fails:
-            raise selenium.common.exceptions.StaleElementReferenceException("Too many stale elements tries")
+            raise selenium.common.exceptions.ElementClickInterceptedException("Too many stale elements or intercepts!")
 
 
 def wait_and_get_element(active_driver, path, center_scroll=True):
