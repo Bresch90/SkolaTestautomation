@@ -7,19 +7,19 @@ import pytest
 from time import sleep
 
 HOMEPAGE = "https://www.kjell.com/se/"
-browser = 'chrome'
+BROWSER = 'chrome'
 
 
 @pytest.fixture(autouse=True, scope='class')
 def driver(request):
-    global browser
+    global BROWSER
     # needed a global variable since it can only be fetched once it seems.
-    browser = request.config.getoption('--browser').lower()
-    match browser:
+    BROWSER = request.config.getoption('--browser').lower()
+    match BROWSER:
         case "chrome":
             from selenium.webdriver.chrome.options import Options
             options = Options()
-            options.add_argument('--headless')
+            # options.add_argument('--headless')
             options.add_argument("--window-size=1920,1080")
             driver = webdriver.Chrome(options=options)
         case "firefox":
@@ -67,7 +67,6 @@ class TestKjell:
         driver.get(HOMEPAGE)
         # accept cookies as it obscures some options
         wait_and_click(driver, "//div[3]/button[2]")
-        driver.maximize_window()  # menu button has different path if screen is too small.
         search_bar = wait_and_get_element(driver, '//form/div[1]/input')
         search_bar.send_keys("test", Keys.RETURN)
 
