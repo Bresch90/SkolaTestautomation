@@ -148,7 +148,7 @@ class TestKjell:
                 item_names_list.append(name)
                 logging.info(f"added {name} to item_names_list")
             price = float(wait_and_get_element(driver,
-                                               f'//span[contains(@class, "fn bu a1") and contains(@class, "po j5")]')
+                                               f'//span[contains(@class, "fn bu a1 ")]')
                           .text.replace(':-', '').replace(' ', ''))  # some contain ":-" and spaces
             # "/html/body/div[1]/div[1]/div/div[4]/section[1]/div[2]/div[2]/span/span"
             # "/html/body/div[1]/div[1]/div/div[4]/div/div[1]/div[1]/div[3]/span/span"
@@ -156,6 +156,8 @@ class TestKjell:
             # '<span class="fn bu a1 pn po j5">89</span>'
             # '//span[@class="fn bu a1 pn po j5"]'
             # '//span[@class="fn bu a1 h3 po j5"]'
+            # 'fn bu a1 p3 p4 j5'
+            'fn bu a1 pk pl kl'
             # '//span[contains(class, "fn bu a1") AND contains(class, "po j5")]'
             # correcting cents(öre) being added as full price. If it has a /sup, its being corrected.
             if driver.find_elements(By.XPATH, f"//section[1]/div[2]/div[2]/span/span/sup"):
