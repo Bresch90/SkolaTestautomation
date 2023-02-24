@@ -4,7 +4,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import ElementClickInterceptedException
 import logging
 import pytest
 from time import sleep
@@ -49,7 +50,7 @@ def driver(request):
         case _:
             raise ValueError(f"Bad input from --browser variable [{BROWSER}]. Did you misspell it?")
     driver.get(HOMEPAGE)
-    # accept cookies as it obscures some options
+    # accept cookies as it obscures some elements
     wait_and_click(driver, "//div[3]/button[2]")
     yield driver
     driver.delete_all_cookies()
@@ -70,9 +71,10 @@ def wait_and_click(active_driver, path, center_scroll=True):
             # ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
             WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path))).click()
             stale_element = False
-        except selenium.common.exceptions.StaleElementReferenceException and \
-                selenium.common.exceptions.ElementClickInterceptedException as e:
-            logging.info("Element was stale! or clickintercepted")
+        except StaleElementReferenceException as e:
+            logging.info("Element was stale! Trying again")
+        except ElementClickInterceptedException as e:
+            logging.info("Click was intercepted! Trying again")
         if counter_fails > 10:
             raise selenium.common.exceptions.StaleElementReferenceException("Too many stale elements tries")
 
