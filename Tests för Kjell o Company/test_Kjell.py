@@ -164,7 +164,22 @@ class TestKjell:
                           .text.replace(':-', '').replace(' ', ''))  # some contain ":-" and spaces
             # looking for both sup on mobile layout and normal
             if driver.find_elements(By.XPATH, f"//section[1]/div[2]/div[2]/span/span/sup") or \
-                    driver.find_elements(By.XPATH, f"//div[3]/span/span/sup"):
+                    driver.find_elements(By.XPATH, f"//div[3]/span/span/sup") or \
+                    driver.find_elements(By.XPATH, f"/html/body/div[1]/div[1]/div/div[4]/div/div[1]/div[1]/div[2]/span/span/sup"):
+                # last one is because some elements behave wierd with path to sup...for example:
+                # https://www.kjell.com/se/produkter/el-verktyg/matinstrument/matsladdar-prober-kontakter/matsladdar/matsladdar-30-v-3-pack-p37842
+                "/html/body/div[1]/div[1]/div/div[4]/section[1]/div[2]/div[2]/span/span/sup"
+                "/html/body/div[1]/div[1]/div/div[4]/div/div[1]/div[1]/div[2]/span/span/sup"
+
+                "/html/body/div[1]/div[1]/div/div[4]/section[1]/div[2]/div[2]/span/span/sup" # stor röv
+                "/html/body/div[1]/div[1]/div/div[4]/div/div[1]/div[1]/div[2]/span/span/sup" # liten röv
+
+                "/html/body/div/div[1]/div/div[4]/section[1]/div[2]/div[2]/span/span/sup" # stor, semi normal
+                "/html/body/div/div[1]/div/div[4]/div/div[1]/div[1]/div[3]/span/span/sup" # liten semi normal
+
+                "/html/body/div/div[1]/div/div[4]/section[1]/div[2]/div[2]/span/span/sup" # stor normal
+                "/html/body/div/div[1]/div/div[4]/div/div[1]/div[1]/div[3]/span/span/sup" # liten normal
+
                 price /= 100
                 logging.info(f"Found sup! for {name}")
             else:
