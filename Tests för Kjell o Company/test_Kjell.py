@@ -1,3 +1,4 @@
+import selenium.common.exceptions
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -56,14 +57,24 @@ def driver(request):
 
 
 def wait_and_click(active_driver, path, center_scroll=True):
-    # wait for element to be available if needed.
-    element = WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
-    # move_to_element action doesn't scroll on firefox, had to use javascript instead.
-    active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
-    if center_scroll:
-        active_driver.execute_script("window.scrollBy(0, -500);")  # center on screen after scroll.
-    # ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
-    WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path))).click()
+    stale_element = True
+    counter_fails = 0
+    while stale_element:
+        try:
+            # wait for element to be available if needed.
+            element = WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
+            # move_to_element action doesn't scroll on firefox, had to use javascript instead.
+            active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
+            if center_scroll:
+                active_driver.execute_script("window.scrollBy(0, -500);")  # center on screen after scroll.
+            # ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
+            WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path))).click()
+            stale_element = False
+        except selenium.common.exceptions.StaleElementReferenceException as e:
+            logging.info("Element was stale!")
+        if counter_fails > 10:
+            raise selenium.common.exceptions.StaleElementReferenceException("Too many stale elements tries")
+
 
 
 def wait_and_get_element(active_driver, path, center_scroll=True):
@@ -73,6 +84,7 @@ def wait_and_get_element(active_driver, path, center_scroll=True):
     active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
     if center_scroll:
         active_driver.execute_script("window.scrollBy(0, -500);")  # center on screen after scroll.
+    # need to fetch element again since the page destroys some elements when scrolling.
     return WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
 
 
