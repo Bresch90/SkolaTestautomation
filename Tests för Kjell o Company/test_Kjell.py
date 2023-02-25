@@ -72,25 +72,37 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=1):
             WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path))).click()
             stale_element = False
         except StaleElementReferenceException as e:
-            logging.warning("Element was stale! Trying again")
+            logging.warning(f"Element {path=} was stale! Trying again")
             tries += 1
         except ElementClickInterceptedException as e:
-            logging.warning("Click was intercepted! Trying again")
+            logging.warning(f"Click on element {path=} was intercepted! Trying again")
             tries += 1
         if tries > max_fails:
             raise selenium.common.exceptions.ElementClickInterceptedException("Too many stale elements or intercepts!")
 
 
-def wait_and_get_element(active_driver, path, center_scroll=True):
-    # wait for element to be available if needed.
-    element = WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
-    # move_to_element action doesn't scroll on firefox, had to use javascript instead.
-    active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
-    if center_scroll:
-        active_driver.execute_script("window.scrollBy(0, -450);")  # center on screen after scroll.
-    # need to fetch element again since the page destroys some elements when scrolling.
-    # this fixed the assertion error with getting name being different on some browsers?
-    return WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
+def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=1):
+    stale_element = True
+    tries = 0
+    while stale_element:
+        try:
+            # wait for element to be available if needed.
+            element = WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
+            # move_to_element action doesn't scroll on firefox, had to use javascript instead.
+            active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
+            if center_scroll:
+                active_driver.execute_script("window.scrollBy(0, -450);")  # center on screen after scroll.
+            # need to fetch element again since the page destroys some elements when scrolling.
+            # this fixed the assertion error with getting name being different on some browsers?
+            return WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
+        except StaleElementReferenceException as e:
+            logging.warning(f"Element {path=} was stale! Trying again")
+            tries += 1
+        except ElementClickInterceptedException as e:
+            logging.warning(f"Click on element {path=} was intercepted! Trying again")
+            tries += 1
+        if tries > max_fails:
+            raise selenium.common.exceptions.ElementClickInterceptedException("Too many stale elements or intercepts!")
 
 
 class TestKjell:
@@ -141,7 +153,7 @@ class TestKjell:
             wait_and_click(driver, f"//div[1]/div/div[{pos}]/a", max_fails=30)  # max_fails because edge in jenkins
             logging.info(f"\ngoing on {pos=}")
             # wait for product page to load a slow element
-            wait_and_get_element(driver, "//span[contains(., 'ställ en fråga')]")
+            wait_and_get_element(driver, "//span[contains(., 'ställ en fråga')]", center_scroll=False)
             name = wait_and_get_element(driver, f"//div[1]/h1").text
             # wait for addToCart or "Bevaka" button
             WebDriverWait(driver, timeout=30).until(lambda d:
@@ -209,7 +221,7 @@ class TestKjell:
                     item_was_found = True
                     break
             assert item_was_found
-            
+
         for item in item_names_list:
             assert item in items_in_cart
         assert f"{sum(prices_dict.values()):.1f}" == f"{total_cart_site:.1f}"  # string to format floating point error
