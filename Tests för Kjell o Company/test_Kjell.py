@@ -15,6 +15,7 @@ BROWSER = ''
 HEADLESS = ''
 logging.basicConfig(level=logging.WARNING)
 DEFAULT_MAX_FAILS = 5
+MAX_TIMEOUT = 30
 
 
 @pytest.fixture(autouse=True, scope='function')
@@ -64,13 +65,13 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MA
     while stale_element:
         try:
             # wait for element to be available if needed.
-            element = WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
+            element = WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(ec.element_to_be_clickable((By.XPATH, path)))
             # move_to_element action doesn't scroll on firefox, had to use javascript instead.
             active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
             if center_scroll:
                 active_driver.execute_script("window.scrollBy(0, -450);")  # center on screen after scroll.
             # ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
-            WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path))).click()
+            WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(ec.element_to_be_clickable((By.XPATH, path))).click()
             stale_element = False
         except StaleElementReferenceException as e:
             logging.warning(f"Element {path=} was stale! Trying again")
@@ -88,14 +89,14 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFA
     while stale_element:
         try:
             # wait for element to be available if needed.
-            element = WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
+            element = WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(ec.element_to_be_clickable((By.XPATH, path)))
             # move_to_element action doesn't scroll on firefox, had to use javascript instead.
             active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
             if center_scroll:
                 active_driver.execute_script("window.scrollBy(0, -450);")  # center on screen after scroll.
             # need to fetch element again since the page destroys some elements when scrolling.
             # this fixed the assertion error with getting name being different on some browsers?
-            return WebDriverWait(active_driver, timeout=30).until(ec.element_to_be_clickable((By.XPATH, path)))
+            return WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(ec.element_to_be_clickable((By.XPATH, path)))
         except StaleElementReferenceException as e:
             logging.warning(f"Element {path=} was stale! Trying again")
             tries += 1
@@ -120,12 +121,12 @@ class TestKjell:
 
     def test_choose_store(self, driver):
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']")  # menu button
-        wait_and_click(driver, "//div[@data-test-id='my-store-button']")  # choose store
+        wait_and_click(driver, "//div[@data-test-id='my-store-button']", center_scroll=False)  # choose store
         wait_and_click(driver, "//li[contains(.,'Kalmar')]")  # select store
-        wait_and_click(driver, "//button[@data-test-id='choose-store-button']")  # accept store
+        wait_and_click(driver, "//button[@data-test-id='choose-store-button']", center_scroll=False)  # accept store
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']")  # menu button
         # check chosen store
-        chosen_store = wait_and_get_element(driver, "//nav/div/div[9]/div[1]/div/div[2]")
+        chosen_store = wait_and_get_element(driver, "//nav/div/div[9]/div[1]/div/div[2]", center_scroll=False)
         assert "kalmar" in chosen_store.text.lower()
 
     @pytest.mark.skip(reason="test_search_exact: Not implemented on site. "
@@ -146,8 +147,7 @@ class TestKjell:
 
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("test", Keys.RETURN)
-        # wait for element on left side to load
-        wait_and_get_element(driver, "//div[2]/div/div[1]/div[1]/div[2]")
+        wait_and_get_element(driver, "//div[2]/div/div[1]/div[1]/div[2]")  # wait for element on left side to load
         # collect data on the products and add to cart
         for pos in product_positions:
             # click on product
@@ -157,7 +157,7 @@ class TestKjell:
             wait_and_get_element(driver, "//span[contains(., 'ställ en fråga')]", center_scroll=False)
             name = wait_and_get_element(driver, f"//div[1]/h1").text
             # wait for addToCart or "Bevaka" button
-            WebDriverWait(driver, timeout=30).until(lambda d:
+            WebDriverWait(driver, timeout=MAX_TIMEOUT).until(lambda d:
                                                     d.find_elements(By.XPATH, "//*[@id='addToCart']")
                                                     or d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
                                                     )

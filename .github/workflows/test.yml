@@ -41,4 +41,4 @@ jobs:
         
       - name: Run Edge tests
         if: success() || failure()
-        run: pytest -s --tb=short --log-cli-level=WARNING --browser=edge --headless=true ./"Tests för Kjell o Company"/test_Kjell.py
+        run: pytest -s --tb=short --log-cli-level=INFO --browser=edge --headless=true ./"Tests för Kjell o Company"/test_Kjell.py
