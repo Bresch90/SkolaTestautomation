@@ -14,6 +14,7 @@ HOMEPAGE = "https://www.kjell.com/se/"
 BROWSER = ''
 HEADLESS = ''
 logging.basicConfig(level=logging.WARNING)
+DEFAULT_MAX_FAILS = 5
 
 
 @pytest.fixture(autouse=True, scope='function')
@@ -57,7 +58,7 @@ def driver(request):
     driver.quit()
 
 
-def wait_and_click(active_driver, path, center_scroll=True, max_fails=1):
+def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MAX_FAILS):
     stale_element = True
     tries = 0
     while stale_element:
@@ -81,7 +82,7 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=1):
             raise selenium.common.exceptions.ElementClickInterceptedException("Too many stale elements or intercepts!")
 
 
-def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=1):
+def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFAULT_MAX_FAILS):
     stale_element = True
     tries = 0
     while stale_element:
