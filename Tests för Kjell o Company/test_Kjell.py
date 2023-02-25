@@ -13,7 +13,7 @@ from time import sleep
 HOMEPAGE = "https://www.kjell.com/se/"
 BROWSER = ''
 HEADLESS = ''
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 
 
 @pytest.fixture(autouse=True, scope='function')
@@ -112,11 +112,7 @@ class TestKjell:
         wait_and_click(driver, "//button[@data-test-id='choose-store-button']")  # accept store
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']")  # menu button
         # check chosen store
-###### check this again
-        # sleep(5)
         chosen_store = wait_and_get_element(driver, "//nav/div/div[9]/div[1]/div/div[2]")
-        # "/html/body/div[1]/div[1]/div/div[6]/div[2]/div/div/div/div[2]/nav/div/div[9]/div[1]/div/div[2]" # stor skärm
-        # "/html/body/div[1]/div[1]/div/div[6]/div[2]/div/div/div/div[2]/nav/div/div[9]/div[1]/div/div[2]"
         assert "kalmar" in chosen_store.text.lower()
 
     @pytest.mark.skip(reason="test_search_exact: Not implemented on site. "
@@ -144,6 +140,8 @@ class TestKjell:
             # click on product
             wait_and_click(driver, f"//div[1]/div/div[{pos}]/a", max_fails=30)  # max_fails because edge in jenkins
             logging.info(f"\ngoing on {pos=}")
+            # wait for product page to load a slow element
+            wait_and_get_element(driver, "//span[contains(., 'ställ en fråga')]")
             name = wait_and_get_element(driver, f"//div[1]/h1").text
             # wait for addToCart or "Bevaka" button
             WebDriverWait(driver, timeout=30).until(lambda d:
@@ -185,6 +183,7 @@ class TestKjell:
 
         # open cart
         wait_and_click(driver, "//button[@data-test-id='cart-button']")
+        # element is on the bottom of page so no scroll back
         total_cart_site = wait_and_get_element(driver, "//div[2]/div[2]/div/span/span", center_scroll=False)\
             .text.replace(' ', '').replace(':', '')  # get total from cart and format string
 
@@ -198,8 +197,11 @@ class TestKjell:
         logging.info(f"{item_names_list=}")
         logging.info(f"{prices_dict}")
 
+        "/html/body/div[1]/div[1]/div/div[4]/div/div[5]/div[2]/button/span/span/div/span[contains(@text, 'ställ en fråga')]"
         # TODO look into this
         # ugly loops because sometimes it grabs the h1, name of item, from page before it opens the product page.
+        # for example, sometimes, products with multiple options, like "Mätsladd 60 V 10-pack"
+        # where there are options for length. The element on the product page doesnt have time to update
         for item in item_names_list:
             item_was_found = False
             for item_in_cart in items_in_cart:
@@ -207,4 +209,7 @@ class TestKjell:
                     item_was_found = True
                     break
             assert item_was_found
+            
+        for item in item_names_list:
+            assert item in items_in_cart
         assert f"{sum(prices_dict.values()):.1f}" == f"{total_cart_site:.1f}"  # string to format floating point error

@@ -22,4 +22,5 @@ Att göra;
 			* Testa inlogg m.m.
 				* Begränsningar
 				* hitta fel?
+				* Olika skärmstorlekar?
 		
