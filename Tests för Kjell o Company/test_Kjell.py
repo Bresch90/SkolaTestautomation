@@ -91,7 +91,8 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFA
     while stale_element:
         try:
             # wait for element to be available if needed.
-            element = WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(ec.element_to_be_clickable((By.XPATH, path)))
+            element = WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
+                                                    ec.element_to_be_clickable((By.XPATH, path)))
             # move_to_element action doesn't scroll on firefox, had to use javascript instead.
             active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
             if center_scroll:
@@ -138,17 +139,35 @@ class TestKjell:
     def test_search_exact(self, driver):
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("\"test\"", Keys.RETURN)
-
-        # wait for element on left side to load
-        wait_and_get_element(driver, "//div[2]/div/div[1]/div[1]/div[2]")
+        wait_and_get_element(driver, "//div[2]/div/div[1]/div[1]/div[2]")  # wait for element on left side to load
         products_list = [e.text for e in driver.find_elements(By.XPATH, "//h3")]
         assert "test" in products_list[0].lower()
 
+    def test_find_item_out_of_stock(self, driver):
+        search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
+        search_bar.send_keys("test", Keys.RETURN)
+        wait_and_get_element(driver, "//div[2]/div/div[1]/div[1]/div[2]")  # wait for element on left side to load
+        # Get availability of all products shown
+        availability_list = [e.text for e in driver.find_elements(
+            By.XPATH, "/html/body/div[1]/div[1]/div/div[4]/div[2]/div/div[2]/div[1]/div/div/div[1]/div/div[1]")]
+        # Guard case if all items are in stock
+        if "Online" not in availability_list:
+            logging.warning(f"All items available? {availability_list=}")
+            pytest.skip(f"All items seem to be in stock? Skipping. "
+                        f"Double check list above doesn't contain only 'Online'")
+        index_of_first_unavailable = availability_list.index("Online") + 1  # +1 for product number on page
+        logging.info(f"{index_of_first_unavailable=}")
+        # get that product numbers page
+        wait_and_click(driver, f"//div[1]/div/div[{index_of_first_unavailable}]/a", max_fails=30)
+        # checks if the button "Bevaka" is there instead of add to cart.
+        assert WebDriverWait(driver, timeout=MAX_TIMEOUT).until(
+                lambda d: d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
+        )
+
     def test_add_to_cart(self, driver):
-        item_names_list = []
-        prices_dict = {}
-        # product_positions = [2, 3, 2, 5, 6, 4, 7, 22, 22, 15, 12, 14, 13, 11]
-        product_positions = [2, 2, 3, 5, 5, 2, 3, 7]
+        products_dict = {}
+        product_positions = [2, 3, 2, 5, 6, 4, 7, 22, 22, 15, 12, 14, 13, 11]
+        # product_positions = [1, 2, 1, 19, 30, 25, 1, 3, 18, 18] # for testing different items
 
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("test", Keys.RETURN)
@@ -173,9 +192,6 @@ class TestKjell:
                 driver.back()
                 continue
 
-            if name not in item_names_list:
-                item_names_list.append(name)
-                logging.info(f"added {name} to item_names_list")
             price = float(wait_and_get_element(driver,
                                                f'//div/span/span')
                           .text.replace(':-', '').replace(' ', ''))  # some contain ":-" and spaces
@@ -191,13 +207,14 @@ class TestKjell:
             else:
                 logging.info(f"Didn't find sup for {name}")
 
-            if name in prices_dict:
-                prices_dict[name] = prices_dict[name] + price
+            if name in products_dict:
+                products_dict[name] = products_dict[name] + price
             else:
-                prices_dict.update({name: price})
+                products_dict.update({name: price})
+            logging.info(f"added {name=} with {price=}")
 
             wait_and_click(driver, "//*[@id='addToCart']")  # add item to cart
-            logging.info(f"cart should now be {item_names_list=}")
+            logging.info(f"cart should now be {products_dict.keys()=}")
             driver.back()
 
         # open cart
@@ -213,22 +230,10 @@ class TestKjell:
         wait_and_get_element(driver, "//div[2]/div/ul/li/div[1]/div[1]/div/a")  # make sure elements are in focus
         items_in_cart = [e.text for e in driver.find_elements(By.XPATH, "//div[2]/div/ul/li/div[1]/div[1]/div/a")]
         logging.info(f"{items_in_cart=}")
-        logging.info(f"{item_names_list=}")
-        logging.info(f"{prices_dict}")
+        logging.info(f"{products_dict.keys()=}")
+        logging.info(f"{products_dict}")
 
-        "/html/body/div[1]/div[1]/div/div[4]/div/div[5]/div[2]/button/span/span/div/span[contains(@text, 'ställ en fråga')]"
-        # TODO look into this
-        # ugly loops because sometimes it grabs the h1, name of item, from page before it opens the product page.
-        # for example, sometimes, products with multiple options, like "Mätsladd 60 V 10-pack"
-        # where there are options for length. The element on the product page doesnt have time to update
-        for item in item_names_list:
-            item_was_found = False
-            for item_in_cart in items_in_cart:
-                if item in item_in_cart:
-                    item_was_found = True
-                    break
-            assert item_was_found
-
-        for item in item_names_list:
+        # checking each item in list if they match what is in the cart
+        for item in products_dict.keys():
             assert item in items_in_cart
-        assert f"{sum(prices_dict.values()):.1f}" == f"{total_cart_site:.1f}"  # string to format floating point error
+        assert f"{sum(products_dict.values()):.1f}" == f"{total_cart_site:.1f}"  # string to format floating point error
