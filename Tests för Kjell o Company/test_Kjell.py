@@ -25,7 +25,7 @@ def driver(request):
     BROWSER = request.config.getoption('--browser').lower()
     HEADLESS = request.config.getoption('--headless').lower()
 
-    # BROWSER = 'edge'
+    # BROWSER = 'firefox'
     match BROWSER:
         case "chrome":
             from selenium.webdriver.chrome.options import Options
@@ -76,9 +76,11 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MA
         except StaleElementReferenceException as e:
             logging.warning(f"Element {path=} was stale! Trying again")
             tries += 1
+            sleep(1)
         except ElementClickInterceptedException as e:
             logging.warning(f"Click on element {path=} was intercepted! Trying again")
             tries += 1
+            sleep(1)
         if tries > max_fails:
             raise selenium.common.exceptions.ElementClickInterceptedException("Too many stale elements or intercepts!")
 
@@ -100,9 +102,11 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFA
         except StaleElementReferenceException as e:
             logging.warning(f"Element {path=} was stale! Trying again")
             tries += 1
+            sleep(1)
         except ElementClickInterceptedException as e:
             logging.warning(f"Click on element {path=} was intercepted! Trying again")
             tries += 1
+            sleep(1)
         if tries > max_fails:
             raise selenium.common.exceptions.ElementClickInterceptedException("Too many stale elements or intercepts!")
 
