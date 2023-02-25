@@ -1,4 +1,3 @@
-import selenium.common.exceptions
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -25,7 +24,7 @@ def driver(request):
     BROWSER = request.config.getoption('--browser').lower()
     HEADLESS = request.config.getoption('--headless').lower()
 
-    # BROWSER = 'firefox'
+    # BROWSER = 'edge'
     match BROWSER:
         case "chrome":
             from selenium.webdriver.chrome.options import Options
@@ -76,13 +75,15 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MA
         except StaleElementReferenceException as e:
             logging.warning(f"Element {path=} was stale! Trying again")
             tries += 1
+            if tries > max_fails:
+                raise StaleElementReferenceException("Too many stale elements!")
             sleep(1)
         except ElementClickInterceptedException as e:
             logging.warning(f"Click on element {path=} was intercepted! Trying again")
             tries += 1
+            if tries > max_fails:
+                raise ElementClickInterceptedException("Too many click intercepts!")
             sleep(1)
-        if tries > max_fails:
-            raise selenium.common.exceptions.ElementClickInterceptedException("Too many stale elements or intercepts!")
 
 
 def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFAULT_MAX_FAILS):
@@ -103,13 +104,15 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFA
         except StaleElementReferenceException as e:
             logging.warning(f"Element {path=} was stale! Trying again")
             tries += 1
+            if tries > max_fails:
+                raise StaleElementReferenceException("Too many stale elements!")
             sleep(1)
         except ElementClickInterceptedException as e:
             logging.warning(f"Click on element {path=} was intercepted! Trying again")
             tries += 1
+            if tries > max_fails:
+                raise ElementClickInterceptedException("Too many click intercepts!")
             sleep(1)
-        if tries > max_fails:
-            raise selenium.common.exceptions.ElementClickInterceptedException("Too many stale elements or intercepts!")
 
 
 class TestKjell:
@@ -149,12 +152,12 @@ class TestKjell:
         wait_and_get_element(driver, "//div[2]/div/div[1]/div[1]/div[2]")  # wait for element on left side to load
         # Get availability of all products shown
         availability_list = [e.text for e in driver.find_elements(
-            By.XPATH, "/html/body/div[1]/div[1]/div/div[4]/div[2]/div/div[2]/div[1]/div/div/div[1]/div/div[1]")]
+            By.XPATH, "//div[2]/div[1]/div/div/div[1]/div/div[1][contains(., 'Online')]")]
         # Guard case if all items are in stock
         if "Online" not in availability_list:
-            logging.warning(f"All items available? {availability_list=}")
-            pytest.skip(f"All items seem to be in stock? Skipping. "
-                        f"Double check list above doesn't contain only 'Online'")
+            logging.warning(f"All items available? "
+                            f"Double check list doesn't contain only 'Online' {availability_list=}")
+            pytest.skip("All items stock? Skipping.")
         index_of_first_unavailable = availability_list.index("Online") + 1  # +1 for product number on page
         logging.info(f"{index_of_first_unavailable=}")
         # get that product numbers page
