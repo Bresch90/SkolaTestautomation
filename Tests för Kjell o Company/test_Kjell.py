@@ -150,21 +150,30 @@ class TestKjell:
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("test", Keys.RETURN)
         wait_and_get_element(driver, "//div[2]/div/div[1]/div[1]/div[2]")  # wait for element on left side to load
+        # gets first item that is out of stock and clicks it
+        wait_and_click(driver, "//*[@id='outofstock_a']/../../../../../../a", max_fails=30)
+
+        "//*[@id='outofstock_a']/../../../../../../a"
+        "//a/../div/div/div/*[local-name()='svg']/*[local-name()='defs']/*[local-name()='path' and @id='outofstock_a']"
         # Get availability of all products shown
-        availability_list = [e.text for e in driver.find_elements(
-            By.XPATH, "//div[2]/div[1]/div/div/div[1]/div/div[1][contains(., 'Online')]")]
+        # availability_list = driver.find_elements(
+        #     By.XPATH, "//circle[@r='10']")
+        # availability_list
+        # "substring(text(), string - length(text()) - string - length('st') + 1) = 'st' or"
+        # "//div[2]/div[1]/div/div/div[1]/div/div[child::text() ='Online']"
+        # logging.info(f"{len(availability_list)}")
         # Guard case if all items are in stock
-        if "Online" not in availability_list:
-            logging.warning(f"All items available? "
-                            f"Double check list doesn't contain only 'Online' {availability_list=}")
-            pytest.skip("All items stock? Skipping.")
-        index_of_first_unavailable = availability_list.index("Online") + 1  # +1 for product number on page
-        logging.info(f"{index_of_first_unavailable=}")
+        # if "Online" not in availability_list:
+        #     logging.warning(f"All items available? "
+        #                     f"Double check list doesn't contain only 'Online' {availability_list=}")
+        #     pytest.skip("All items stock? Skipping.")
+        # index_of_first_unavailable = int((availability_list.index("Online") + 1)/2)  # +1 for product number on page
+        # logging.info(f"{index_of_first_unavailable=}")
         # get that product numbers page
-        wait_and_click(driver, f"//div[1]/div/div[{index_of_first_unavailable}]/a", max_fails=30)
+        # wait_and_click(driver, f"//div[1]/div/div[{index_of_first_unavailable}]/a", max_fails=30)
         # checks if the button "Bevaka" is there instead of add to cart.
         assert WebDriverWait(driver, timeout=MAX_TIMEOUT).until(
-                lambda d: d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
+            lambda d: d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
         )
 
     def test_add_to_cart(self, driver):
