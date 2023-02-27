@@ -69,7 +69,7 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MA
             # move_to_element action doesn't scroll on firefox, had to use javascript instead.
             active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
             if center_scroll:
-                active_driver.execute_script("window.scrollBy(0, -350);")  # center on screen after scroll.
+                active_driver.execute_script("window.scrollBy(0, -650);")  # center on screen after scroll.
             # ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
             WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
                 ec.element_to_be_clickable((By.XPATH, path))).click()
@@ -104,7 +104,7 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFA
             # move_to_element action doesn't scroll on firefox, had to use javascript instead.
             active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
             if center_scroll:
-                active_driver.execute_script("window.scrollBy(0, -350);")  # center on screen after scroll.
+                active_driver.execute_script("window.scrollBy(0, -650);")  # center on screen after scroll.
             # need to fetch element again since the page destroys some elements when scrolling.
             # this fixed the assertion error with getting name being different on some browsers?
             return WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
@@ -173,7 +173,7 @@ class TestKjell:
 
     def test_add_to_cart(self, driver):
         products_dict = {}
-        product_positions = [2, 3, 2, 5, 6, 4, 7, 22, 22, 15, 12, 14, 13, 11]
+        product_positions = [2, 3, 2, 5, 6, 4, 7, 8, 22, 22, 15, 12, 14, 13, 11]
         # product_positions = [1, 2, 1, 19, 30, 25, 1, 3, 18, 18] # for testing different items
 
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
