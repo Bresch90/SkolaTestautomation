@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import ElementClickInterceptedException
+from selenium.common.exceptions import TimeoutException
 import logging
 import pytest
 from time import sleep
@@ -59,19 +60,20 @@ def driver(request):
 
 
 def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MAX_FAILS):
-    stale_element = True
     tries = 0
-    while stale_element:
+    while True:
         try:
             # wait for element to be available if needed.
-            element = WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(ec.element_to_be_clickable((By.XPATH, path)))
+            element = WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
+                ec.element_to_be_clickable((By.XPATH, path)))
             # move_to_element action doesn't scroll on firefox, had to use javascript instead.
             active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
             if center_scroll:
                 active_driver.execute_script("window.scrollBy(0, -450);")  # center on screen after scroll.
             # ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
-            WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(ec.element_to_be_clickable((By.XPATH, path))).click()
-            stale_element = False
+            WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
+                ec.element_to_be_clickable((By.XPATH, path))).click()
+            return
         except StaleElementReferenceException as e:
             logging.warning(f"Element {path=} was stale! Trying again")
             tries += 1
@@ -84,23 +86,29 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MA
             if tries > max_fails:
                 raise ElementClickInterceptedException("Too many click intercepts!")
             sleep(1)
+        except TimeoutException as e:
+            logging.warning(f"Timeout on element {path=}! Trying again")
+            tries += 1
+            if tries > max_fails:
+                raise TimeoutException("Too many timeouts!")
+            sleep(1)
 
 
 def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFAULT_MAX_FAILS):
-    stale_element = True
     tries = 0
-    while stale_element:
+    while True:
         try:
             # wait for element to be available if needed.
             element = WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
-                                                    ec.element_to_be_clickable((By.XPATH, path)))
+                ec.element_to_be_clickable((By.XPATH, path)))
             # move_to_element action doesn't scroll on firefox, had to use javascript instead.
             active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
             if center_scroll:
                 active_driver.execute_script("window.scrollBy(0, -450);")  # center on screen after scroll.
             # need to fetch element again since the page destroys some elements when scrolling.
             # this fixed the assertion error with getting name being different on some browsers?
-            return WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(ec.element_to_be_clickable((By.XPATH, path)))
+            return WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
+                ec.element_to_be_clickable((By.XPATH, path)))
         except StaleElementReferenceException as e:
             logging.warning(f"Element {path=} was stale! Trying again")
             tries += 1
@@ -112,6 +120,12 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFA
             tries += 1
             if tries > max_fails:
                 raise ElementClickInterceptedException("Too many click intercepts!")
+            sleep(1)
+        except TimeoutException as e:
+            logging.warning(f"Timeout on element {path=}! Trying again")
+            tries += 1
+            if tries > max_fails:
+                raise TimeoutException("Too many timeouts!")
             sleep(1)
 
 
@@ -207,6 +221,7 @@ class TestKjell:
             logging.info(f"added {name=} with {price=}")
 
             wait_and_click(driver, "//*[@id='addToCart']")  # add item to cart
+            wait_and_get_element(driver, "//span[contains(., 'Tillagd i din varukorg')]")
             logging.info(f"cart should now be {products_dict.keys()=}")
             driver.back()
 
