@@ -233,7 +233,8 @@ class TestKjell:
             logging.info(f"added {name=} with {price=}")
 
             wait_and_click(driver, "//*[@id='addToCart']")  # add item to cart
-            wait_and_get_element(driver, "//span[contains(., 'Tillagd i din varukorg')]")
+            wait_and_get_element(driver, "//*[@id='addToCart' and @aria-label='[object Object],false,false']")
+            # wait_and_get_element(driver, "//span[contains(., 'Tillagd i din varukorg')]")
             logging.info(f"cart should now be {products_dict.keys()=}")
             driver.back()
 
