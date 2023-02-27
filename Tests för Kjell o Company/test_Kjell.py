@@ -171,6 +171,18 @@ class TestKjell:
             lambda d: d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
         )
 
+    def test_find_item_through_menu(self, driver):
+        # navigate left menu
+        wait_and_click(driver, "//button[@data-test-id='main-menu-button']")
+        wait_and_click(driver, "//span[contains(text(), 'Kablar & kontakter')]/../div")
+        wait_and_click(driver, "//span[contains(text(), 'HDMI')]/../div")
+        wait_and_click(driver, "//span[contains(text(), 'Micro-HDMI')]/..")
+
+        # check that there are at least one item with Micro-HDMI in the name.
+        assert WebDriverWait(driver, timeout=MAX_TIMEOUT).until(
+            lambda d: d.find_elements(By.XPATH, "//h3[contains(text(), 'Micro-HDMI')]")
+        )
+
     def test_add_to_cart(self, driver):
         products_dict = {}
         product_positions = [2, 3, 2, 5, 6, 4, 7, 8, 22, 22, 15, 12, 14, 13, 11]
