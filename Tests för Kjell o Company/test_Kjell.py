@@ -179,7 +179,8 @@ class TestKjell:
     def test_find_item_out_of_stock(self, driver):
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("test", Keys.RETURN)
-        wait_and_get_element(driver, "//div[@data-test-id='product-card']")  # wait for element on left side to load
+        # wait for products to load
+        wait_and_get_element(driver, "//div[2]/div[1]/div/div[@data-test-id='product-card']")
         # gets first item that is out of stock and clicks it
         wait_and_click(driver, "//*[@id='outofstock_a']/../../../../../../a")
         # checks if the button "Bevaka" is there instead of add to cart.
@@ -202,26 +203,25 @@ class TestKjell:
 
     def test_add_to_cart(self, driver):
         products_dict = {}
-        product_positions = [2, 3, 2, 5, 6, 4, 7, 8, 22, 22, 15, 12, 14, 13, 11]
+        product_positions = [2, 3, 2, 5, 6, 4, 7, 8, 22, 22, 15, 12, 14, 13, 11, 1]
         # product_positions = [1, 2, 1, 19, 30, 25, 1, 3, 18, 18] # for testing different items
 
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("test", Keys.RETURN)
-        wait_and_get_element(driver, "//div[2]/div/div[1]/div[1]/div[2]")  # wait for element on left side to load
+        # wait for products to load
+        wait_and_get_element(driver, "//div[2]/div[1]/div/div[@data-test-id='product-card']")
         # collect data on the products and add to cart
         for pos in product_positions:
             # click on product
-            wait_and_click(driver, f"//div[1]/div/div[{pos}]/a")  # max_fails because edge in jenkins
+            wait_and_click(driver, f"//div[2]/div[1]/div/div[{pos}][@data-test-id='product-card']/a")
             logging.info(f"going on {pos=}")
-            # wait for product page to load a slow element
-            wait_and_get_element(driver, "//span[contains(., 'ställ en fråga')]", center_scroll=False)
-            name = wait_and_get_element(driver, f"//div[1]/h1").text
-            # wait for addToCart or "Bevaka" button
+            # wait for product page to load
             WebDriverWait(driver, timeout=MAX_TIMEOUT).until(
                 lambda d:
-                d.find_elements(By.XPATH, "//*[@id='addToCart']")
+                d.find_elements(By.XPATH, "//button[@id='clickAndCollect']")
                 or d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
             )
+            name = wait_and_get_element(driver, f"//div[1]/h1").text
             # check if item is out of stock
             if driver.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]"):
                 logging.info(f"\n{name} {pos=} is not available for purchase, skipping it")
