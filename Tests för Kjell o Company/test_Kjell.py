@@ -52,8 +52,7 @@ def driver(request):
         case _:
             raise ValueError(f"Bad input from --browser variable [{BROWSER}]. Did you misspell it?")
     driver.get(HOMEPAGE)
-    # accept cookies as it obscures some elements
-    wait_and_click(driver, "//div[3]/button[2]")
+    wait_and_click(driver, "//div[3]/button[2]")  # accept cookies as it obscures some elements
     yield driver
     driver.delete_all_cookies()
     driver.quit()
@@ -74,8 +73,14 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MA
                 # variate scroll back, see if that fixes "ImBox chat launcher" intercepts
                 scroll_value += 50
             # ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
-            WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
-                ec.element_to_be_clickable((By.XPATH, path))).click()
+            if tries > max_fails-1:
+                WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
+                    ec.element_to_be_clickable((By.XPATH, path))).click()
+            else:
+                active_driver.execute_script(f"arguments[0].click();",
+                                             WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
+                                                 ec.element_to_be_clickable((By.XPATH, path)
+                                                                            )))
             return
         except StaleElementReferenceException as e:
             logging.warning(f"Element {path=} was stale! Trying again")
