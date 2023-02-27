@@ -25,7 +25,7 @@ def driver(request):
     BROWSER = request.config.getoption('--browser').lower()
     HEADLESS = request.config.getoption('--headless').lower()
 
-    # BROWSER = 'edge'
+    # BROWSER = 'firefox'
     match BROWSER:
         case "chrome":
             from selenium.webdriver.chrome.options import Options
@@ -155,13 +155,13 @@ class TestKjell:
         assert example_element
 
     def test_choose_store(self, driver):
-        sleep(1)
-        wait_and_click(driver, "//button[@data-test-id='main-menu-button']")  # menu button
+        wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
         wait_and_click(driver, "//div[@data-test-id='my-store-button']", center_scroll=False)  # choose store
         wait_and_click(driver, "//li[contains(.,'Kalmar')]")  # select store
         wait_and_click(driver, "//button[@data-test-id='choose-store-button']", center_scroll=False)  # accept store
+        # ec.invisibility_of_element_located((By.XPATH, "//span[text()='Meny']"))  # wait for menu to closed
         sleep(1)
-        wait_and_click(driver, "//button[@data-test-id='main-menu-button']")  # menu button
+        wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
         # check chosen store
         chosen_store = wait_and_get_element(driver,
                                             "//div[@data-test-id='my-store-button']/div/div[2]", center_scroll=False)
@@ -190,7 +190,6 @@ class TestKjell:
 
     def test_find_item_through_menu(self, driver):
         # navigate left menu
-        sleep(1)
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']")
         wait_and_click(driver, "//span[contains(text(), 'Kablar & kontakter')]/../div")
         wait_and_click(driver, "//span[contains(text(), 'HDMI')]/../div")
