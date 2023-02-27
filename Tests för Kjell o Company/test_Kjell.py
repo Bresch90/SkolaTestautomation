@@ -52,7 +52,7 @@ def driver(request):
         case _:
             raise ValueError(f"Bad input from --browser variable [{BROWSER}]. Did you misspell it?")
     driver.get(HOMEPAGE)
-    wait_and_click(driver, "//div[3]/button[2]")  # accept cookies as it obscures some elements
+    wait_and_click(driver, "//span[text()='Acceptera']/..")  # accept cookies as it obscures some elements
     yield driver
     driver.delete_all_cookies()
     driver.quit()
@@ -153,13 +153,16 @@ class TestKjell:
         assert example_element
 
     def test_choose_store(self, driver):
+        sleep(1)
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']")  # menu button
         wait_and_click(driver, "//div[@data-test-id='my-store-button']", center_scroll=False)  # choose store
         wait_and_click(driver, "//li[contains(.,'Kalmar')]")  # select store
         wait_and_click(driver, "//button[@data-test-id='choose-store-button']", center_scroll=False)  # accept store
+        sleep(1)
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']")  # menu button
         # check chosen store
-        chosen_store = wait_and_get_element(driver, "//nav/div/div[9]/div[1]/div/div[2]", center_scroll=False)
+        chosen_store = wait_and_get_element(driver,
+                                            "//div[@data-test-id='my-store-button']/div/div[2]", center_scroll=False)
         assert "kalmar" in chosen_store.text.lower()
 
     @pytest.mark.skip(reason="test_search_exact: Not implemented on site. "
@@ -174,7 +177,7 @@ class TestKjell:
     def test_find_item_out_of_stock(self, driver):
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("test", Keys.RETURN)
-        wait_and_get_element(driver, "//div[2]/div/div[1]/div[1]/div[2]")  # wait for element on left side to load
+        wait_and_get_element(driver, "//div[@data-test-id='product-card']")  # wait for element on left side to load
         # gets first item that is out of stock and clicks it
         wait_and_click(driver, "//*[@id='outofstock_a']/../../../../../../a")
         # checks if the button "Bevaka" is there instead of add to cart.
@@ -244,7 +247,9 @@ class TestKjell:
             logging.info(f"added {name=} with {price=}")
 
             wait_and_click(driver, "//*[@id='addToCart']")  # add item to cart
-            wait_and_get_element(driver, "//*[@id='addToCart' and @aria-label='[object Object],false,false']")
+            # wait for checkmark on button
+            wait_and_get_element(driver, "//*[@id='addToCart']/span/*[local-name()='svg']")
+            # wait_and_get_element(driver, "//*[@id='addToCart' and @aria-label='[object Object],false,false']")
             # wait_and_get_element(driver, "//span[contains(., 'Tillagd i din varukorg')]")
             logging.info(f"cart should now be {products_dict.keys()=}")
             driver.back()
