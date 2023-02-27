@@ -61,6 +61,7 @@ def driver(request):
 
 def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MAX_FAILS):
     tries = 0
+    scroll_value = -650
     while True:
         try:
             # wait for element to be available if needed.
@@ -69,7 +70,9 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MA
             # move_to_element action doesn't scroll on firefox, had to use javascript instead.
             active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
             if center_scroll:
-                active_driver.execute_script("window.scrollBy(0, -650);")  # center on screen after scroll.
+                active_driver.execute_script(f"window.scrollBy(0, {scroll_value});")  # center on screen after scroll.
+                # variate scroll back, see if that fixes "ImBox chat launcher" intercepts
+                scroll_value += 50
             # ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
             WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
                 ec.element_to_be_clickable((By.XPATH, path))).click()
@@ -96,6 +99,7 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MA
 
 def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFAULT_MAX_FAILS):
     tries = 0
+    scroll_value = -650
     while True:
         try:
             # wait for element to be available if needed.
@@ -104,7 +108,9 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFA
             # move_to_element action doesn't scroll on firefox, had to use javascript instead.
             active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
             if center_scroll:
-                active_driver.execute_script("window.scrollBy(0, -650);")  # center on screen after scroll.
+                active_driver.execute_script(f"window.scrollBy(0, {scroll_value});")  # center on screen after scroll.
+                # variate scroll back, see if that fixes being flaky
+                scroll_value += 50
             # need to fetch element again since the page destroys some elements when scrolling.
             # this fixed the assertion error with getting name being different on some browsers?
             return WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
