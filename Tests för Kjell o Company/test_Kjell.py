@@ -63,6 +63,7 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MA
     scroll_value = -650
     while True:
         try:
+            active_driver.execute_script(f"window.scrollBy(0, document.body.scrollHeight);")
             # wait for element to be available if needed.
             element = WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
                 ec.element_to_be_clickable((By.XPATH, path)))
@@ -107,6 +108,7 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFA
     scroll_value = -650
     while True:
         try:
+            active_driver.execute_script(f"window.scrollBy(0, document.body.scrollHeight);")
             # wait for element to be available if needed.
             element = WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
                 ec.element_to_be_clickable((By.XPATH, path)))
@@ -187,6 +189,7 @@ class TestKjell:
 
     def test_find_item_through_menu(self, driver):
         # navigate left menu
+        sleep(1)
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']")
         wait_and_click(driver, "//span[contains(text(), 'Kablar & kontakter')]/../div")
         wait_and_click(driver, "//span[contains(text(), 'HDMI')]/../div")
