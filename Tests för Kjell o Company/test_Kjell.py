@@ -69,7 +69,7 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MA
             # move_to_element action doesn't scroll on firefox, had to use javascript instead.
             active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
             if center_scroll:
-                active_driver.execute_script("window.scrollBy(0, -450);")  # center on screen after scroll.
+                active_driver.execute_script("window.scrollBy(0, -350);")  # center on screen after scroll.
             # ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
             WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
                 ec.element_to_be_clickable((By.XPATH, path))).click()
@@ -104,7 +104,7 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFA
             # move_to_element action doesn't scroll on firefox, had to use javascript instead.
             active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
             if center_scroll:
-                active_driver.execute_script("window.scrollBy(0, -450);")  # center on screen after scroll.
+                active_driver.execute_script("window.scrollBy(0, -350);")  # center on screen after scroll.
             # need to fetch element again since the page destroys some elements when scrolling.
             # this fixed the assertion error with getting name being different on some browsers?
             return WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
@@ -165,7 +165,7 @@ class TestKjell:
         search_bar.send_keys("test", Keys.RETURN)
         wait_and_get_element(driver, "//div[2]/div/div[1]/div[1]/div[2]")  # wait for element on left side to load
         # gets first item that is out of stock and clicks it
-        wait_and_click(driver, "//*[@id='outofstock_a']/../../../../../../a", max_fails=30)
+        wait_and_click(driver, "//*[@id='outofstock_a']/../../../../../../a")
         # checks if the button "Bevaka" is there instead of add to cart.
         assert WebDriverWait(driver, timeout=MAX_TIMEOUT).until(
             lambda d: d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
@@ -182,7 +182,7 @@ class TestKjell:
         # collect data on the products and add to cart
         for pos in product_positions:
             # click on product
-            wait_and_click(driver, f"//div[1]/div/div[{pos}]/a", max_fails=30)  # max_fails because edge in jenkins
+            wait_and_click(driver, f"//div[1]/div/div[{pos}]/a")  # max_fails because edge in jenkins
             logging.info(f"going on {pos=}")
             # wait for product page to load a slow element
             wait_and_get_element(driver, "//span[contains(., 'ställ en fråga')]", center_scroll=False)
