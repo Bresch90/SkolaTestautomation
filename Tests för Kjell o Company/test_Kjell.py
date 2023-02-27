@@ -77,6 +77,7 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MA
             if tries > max_fails-1:
                 WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
                     ec.element_to_be_clickable((By.XPATH, path))).click()
+                logging.warning("MADE CLICK WITH JAVASCRIPT AS LAST TRY!")
             else:
                 active_driver.execute_script(f"arguments[0].click();",
                                              WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
