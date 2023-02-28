@@ -208,6 +208,9 @@ class TestKjell:
         # wait for products to load
         wait_and_get_element(driver, "//div[2]/div[1]/div/div[@data-test-id='product-card']")
         # gets first item that is out of stock and clicks it
+        if not driver.find_elements(By.XPATH, "//*[@id='outofstock_a']/../../../../../../a"):
+            logging.warning("No products out of stock? Skipping")
+            pytest.skip("Seems all products are in stock today!")
         wait_and_click(driver, "//*[@id='outofstock_a']/../../../../../../a")
         # checks if the button "Bevaka" is there instead of add to cart.
         assert WebDriverWait(driver, timeout=MAX_TIMEOUT).until(
