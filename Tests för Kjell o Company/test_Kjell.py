@@ -184,7 +184,7 @@ class TestKjell:
 
         # driver.execute_script("arguments[0].click()", driver.find_element(By.XPATH, "//button[@data-test-id='main-menu-button']"))
         # wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
-        sleep(1)
+        # sleep(1)
         click_menu_retry(driver)
         # check chosen store
         #TODO this element cant be found often, menu button fail to press? without sleep its even worse...
