@@ -246,8 +246,9 @@ class TestKjell:
             # wait for product page to load
             WebDriverWait(driver, timeout=MAX_TIMEOUT).until(
                 lambda d:
-                d.find_elements(By.XPATH, "//button[@id='clickAndCollect']")
-                or d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
+                    d.find_elements(By.XPATH, "//button[@id='clickAndCollect']")
+                    or d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
+                    or d.find_elements(By.XPATH, "//*[@id='addToCart']")
             )
             name = wait_and_get_element(driver, f"//div[1]/h1").text
             # check if item is out of stock
