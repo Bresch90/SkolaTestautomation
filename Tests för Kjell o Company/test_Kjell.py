@@ -22,10 +22,10 @@ MAX_TIMEOUT = 5
 def driver(request):
     global BROWSER, HEADLESS
     # needed a global variable since it can only be fetched once it seems.
-    # BROWSER = request.config.getoption('--browser').lower()
+    BROWSER = request.config.getoption('--browser').lower()
     HEADLESS = request.config.getoption('--headless').lower()
 
-    BROWSER = 'firefox'
+    # BROWSER = 'firefox'
     match BROWSER:
         case "chrome":
             from selenium.webdriver.chrome.options import Options
@@ -152,8 +152,7 @@ def click_menu_retry(active_driver):
         try:
             wait_and_click(active_driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)
             WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
-                ec.element_to_be_clickable((By.XPATH, "//div[@data-test-id='my-store-button']")))
-            active_driver.find_element(By.XPATH, "//div[@data-test-id='my-store-button']")
+                ec.element_to_be_clickable((By.XPATH, "//div[@data-test-id='my-store-button']/div/div[2]")))
             return
         except TimeoutException as e:
             tries += 1
@@ -175,8 +174,8 @@ class TestKjell:
         assert example_element
 
     def test_choose_store(self, driver):
-        click_menu_retry(driver)
-        # wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
+        # click_menu_retry(driver)
+        wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
         wait_and_click(driver, "//div[@data-test-id='my-store-button']", center_scroll=False)  # choose store
 
         wait_and_click(driver, "//li[contains(.,'Kalmar')]")  # select store
@@ -213,7 +212,7 @@ class TestKjell:
             pytest.skip("Seems all products are in stock today!")
         wait_and_click(driver, "//*[@id='outofstock_a']/../../../../../../a")
         # checks if the button "Bevaka" is there instead of add to cart.
-        assert WebDriverWait(driver, timeout=MAX_TIMEOUT).until(
+        assert WebDriverWait(driver, timeout=30).until(
             lambda d: d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
         )
 
@@ -225,7 +224,7 @@ class TestKjell:
         wait_and_click(driver, "//span[contains(text(), 'Micro-HDMI')]/..")
 
         # check that there are at least one item with Micro-HDMI in the name.
-        assert WebDriverWait(driver, timeout=MAX_TIMEOUT).until(
+        assert WebDriverWait(driver, timeout=30).until(
             lambda d: d.find_elements(By.XPATH, "//h3[contains(text(), 'Micro-HDMI')]")
         )
 
@@ -244,7 +243,7 @@ class TestKjell:
             wait_and_click(driver, f"//div[2]/div[1]/div/div[{pos}][@data-test-id='product-card']/a")
             logging.info(f"going on {pos=}")
             # wait for product page to load
-            WebDriverWait(driver, timeout=MAX_TIMEOUT).until(
+            WebDriverWait(driver, timeout=30).until(
                 lambda d:
                     d.find_elements(By.XPATH, "//button[@id='clickAndCollect']")
                     or d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
