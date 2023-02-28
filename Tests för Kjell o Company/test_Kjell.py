@@ -15,17 +15,17 @@ BROWSER = ''
 HEADLESS = ''
 logging.basicConfig(level=logging.WARNING)
 DEFAULT_MAX_FAILS = 5
-MAX_TIMEOUT = 30
+MAX_TIMEOUT = 5
 
 
 @pytest.fixture(autouse=True, scope='function')
 def driver(request):
     global BROWSER, HEADLESS
     # needed a global variable since it can only be fetched once it seems.
-    BROWSER = request.config.getoption('--browser').lower()
+    # BROWSER = request.config.getoption('--browser').lower()
     HEADLESS = request.config.getoption('--headless').lower()
 
-    # BROWSER = 'firefox'
+    BROWSER = 'firefox'
     match BROWSER:
         case "chrome":
             from selenium.webdriver.chrome.options import Options
@@ -52,7 +52,10 @@ def driver(request):
         case _:
             raise ValueError(f"Bad input from --browser variable [{BROWSER}]. Did you misspell it?")
     driver.get(HOMEPAGE)
+    #TODO fails to find/press accept sometimes?
     wait_and_click(driver, "//span[text()='Acceptera']/..")  # accept cookies as it obscures some elements
+    WebDriverWait(driver, timeout=MAX_TIMEOUT).until(
+        ec.invisibility_of_element((By.XPATH, "//span[text()='Acceptera']/..")))
     yield driver
     driver.delete_all_cookies()
     driver.quit()
@@ -143,6 +146,22 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFA
             sleep(1)
 
 
+def click_menu_retry(active_driver):
+    tries = 0
+    while True:
+        try:
+            wait_and_click(active_driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)
+            WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
+                ec.element_to_be_clickable((By.XPATH, "//div[@data-test-id='my-store-button']")))
+            active_driver.find_element(By.XPATH, "//div[@data-test-id='my-store-button']")
+            return
+        except TimeoutException as e:
+            tries += 1
+            if tries > DEFAULT_MAX_FAILS:
+                raise TimeoutException("Failed to click menu button too many times!")
+            logging.warning("Failed to click menu button! Trying again.")
+
+
 class TestKjell:
     def test_open_homepage(self, driver):
         assert "kjell" in driver.title.lower()
@@ -156,14 +175,20 @@ class TestKjell:
         assert example_element
 
     def test_choose_store(self, driver):
-        wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
+        click_menu_retry(driver)
+        # wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
         wait_and_click(driver, "//div[@data-test-id='my-store-button']", center_scroll=False)  # choose store
+
         wait_and_click(driver, "//li[contains(.,'Kalmar')]")  # select store
         wait_and_click(driver, "//button[@data-test-id='choose-store-button']", center_scroll=False)  # accept store
-        # ec.invisibility_of_element_located((By.XPATH, "//span[text()='Meny']"))  # wait for menu to closed
+        # ec.invisibility_of_element_located((By.XPATH, "//div[@class='m5']"))  # wait for menu to closed
+
+        # driver.execute_script("arguments[0].click()", driver.find_element(By.XPATH, "//button[@data-test-id='main-menu-button']"))
+        # wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
         sleep(1)
-        wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
+        click_menu_retry(driver)
         # check chosen store
+        #TODO this element cant be found often, menu button fail to press? without sleep its even worse...
         chosen_store = wait_and_get_element(driver,
                                             "//div[@data-test-id='my-store-button']/div/div[2]", center_scroll=False)
         assert "kalmar" in chosen_store.text.lower()
