@@ -183,9 +183,9 @@ class TestKjell:
         # ec.invisibility_of_element_located((By.XPATH, "//div[@class='m5']"))  # wait for menu to closed
 
         # driver.execute_script("arguments[0].click()", driver.find_element(By.XPATH, "//button[@data-test-id='main-menu-button']"))
-        # wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
-        # sleep(1)
-        click_menu_retry(driver)
+        sleep(1)
+        wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
+        # click_menu_retry(driver)
         # check chosen store
         #TODO this element cant be found often, menu button fail to press? without sleep its even worse...
         chosen_store = wait_and_get_element(driver,
