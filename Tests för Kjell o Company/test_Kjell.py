@@ -66,6 +66,7 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MA
     scroll_value = -650
     while True:
         try:
+            # added scrolling to bottom, seemed to fix some elements never loading?
             active_driver.execute_script(f"window.scrollBy(0, document.body.scrollHeight);")
             # wait for element to be available if needed.
             element = WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
@@ -77,15 +78,17 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MA
                 # variate scroll back, see if that fixes "ImBox chat launcher" intercepts
                 # scroll_value += 50
             # ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
+
+            # added javascript click as last try, haven't seen it work yet though...
             if tries > max_fails-1:
-                WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
-                    ec.element_to_be_clickable((By.XPATH, path))).click()
-                logging.warning("MADE CLICK WITH JAVASCRIPT AS LAST TRY!")
-            else:
                 active_driver.execute_script(f"arguments[0].click();",
                                              WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
                                                  ec.element_to_be_clickable((By.XPATH, path)
                                                                             )))
+                logging.warning("MADE CLICK WITH JAVASCRIPT AS LAST TRY!")
+            else:
+                WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
+                    ec.element_to_be_clickable((By.XPATH, path))).click()
             return
         except StaleElementReferenceException as e:
             logging.warning(f"Element {path=} was stale! Trying again")
@@ -112,6 +115,7 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFA
     scroll_value = -650
     while True:
         try:
+            # added scrolling to bottom, seemed to fix some elements never loading?
             active_driver.execute_script(f"window.scrollBy(0, document.body.scrollHeight);")
             # wait for element to be available if needed.
             element = WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
@@ -146,21 +150,6 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFA
             sleep(1)
 
 
-def click_menu_retry(active_driver):
-    tries = 0
-    while True:
-        try:
-            wait_and_click(active_driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)
-            WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
-                ec.element_to_be_clickable((By.XPATH, "//div[@data-test-id='my-store-button']/div/div[2]")))
-            return
-        except TimeoutException as e:
-            tries += 1
-            if tries > DEFAULT_MAX_FAILS:
-                raise TimeoutException("Failed to click menu button too many times!")
-            logging.warning("Failed to click menu button! Trying again.")
-
-
 class TestKjell:
     def test_open_homepage(self, driver):
         assert "kjell" in driver.title.lower()
@@ -170,8 +159,7 @@ class TestKjell:
         search_bar.send_keys("test", Keys.RETURN)
 
         # get product from search results
-        example_element = wait_and_get_element(driver, "//h3[contains(., 'Kabeltestare')]")
-        assert example_element
+        assert wait_and_get_element(driver, "//h3[contains(., 'Kabeltestare')]")
 
     def test_choose_store(self, driver):
         # click_menu_retry(driver)
@@ -212,9 +200,7 @@ class TestKjell:
             pytest.skip("Seems all products are in stock today!")
         wait_and_click(driver, "//*[@id='outofstock_a']/../../../../../../a")
         # checks if the button "Bevaka" is there instead of add to cart.
-        assert WebDriverWait(driver, timeout=30).until(
-            lambda d: d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
-        )
+        assert wait_and_get_element(driver, "//button[contains(text(), 'Bevaka')]")
 
     def test_find_item_through_menu(self, driver):
         # navigate left menu
@@ -224,9 +210,7 @@ class TestKjell:
         wait_and_click(driver, "//span[contains(text(), 'Micro-HDMI')]/..")
 
         # check that there are at least one item with Micro-HDMI in the name.
-        assert WebDriverWait(driver, timeout=30).until(
-            lambda d: d.find_elements(By.XPATH, "//h3[contains(text(), 'Micro-HDMI')]")
-        )
+        assert wait_and_get_element(driver, "//h3[contains(text(), 'Micro-HDMI')]")
 
     def test_add_to_cart(self, driver):
         products_dict = {}

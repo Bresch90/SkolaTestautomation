@@ -5,22 +5,24 @@ Test automation av sidan https://www.kjell.com/se
 Att göra; 
 
 	Test analys av sidan:
-		* Navigering
-		* Filtrering/Sökning
-			* Olika kategorier
-			* Sökfunktioner
-		* Lägga till i kundkorg
-			* Kontroller av kundkorg
-				* Summa
-				* Varor
-				* Ändra antal varor
-				* Uppdateras rätt
+		- [x] Navigering
+		- [ ] Filtrering/Sökning
+			- [x] Olika kategorier
+			- [x] Sökfunktioner
+			- [ ] Olika filter
+			- [ ] Olika visnings ordning
+		- [ ] Lägga till i kundkorg
+			- [ ] Kontroller av kundkorg
+				- [x] Summa
+				- [x] Varor
+				- [ ] Ändra antal varor
+				- [ ] Uppdateras rätt
 	
 	
 	Extra:
-		* Inloggning
-			* Testa inlogg m.m.
-				* Begränsningar
-				* hitta fel?
-				* Olika skärmstorlekar?
+		- [ ] Inloggning
+			- [ ] Testa inlogg m.m.
+				- [ ] Begränsningar
+				- [ ] hitta fel?
+				- [ ] Olika skärmstorlekar?
 		
