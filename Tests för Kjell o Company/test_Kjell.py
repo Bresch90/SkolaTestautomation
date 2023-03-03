@@ -78,6 +78,7 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=MAX_FAILS)
                 active_driver.execute_script(f"window.scrollBy(0, -650);")  # center on screen after scroll.
 
             # added javascript click as last try, haven't seen it work yet though...
+            # seems like clicking is not the problem, waiting for element to be clickable/finding is the problem.
             if tries > max_fails-1:
                 active_driver.execute_script(f"arguments[0].click();",
                                              WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
@@ -93,19 +94,19 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=MAX_FAILS)
             logging.warning(f"Element {path=} was stale! Trying again")
             tries += 1
             if tries > max_fails:
-                raise StaleElementReferenceException("Too many stale elements!")
+                raise StaleElementReferenceException(f"Too many stale elements! {path=}")
             sleep(1)
         except ElementClickInterceptedException as e:
             logging.warning(f"Click on element {path=} was intercepted! Trying again")
             tries += 1
             if tries > max_fails:
-                raise ElementClickInterceptedException("Too many click intercepts!")
+                raise ElementClickInterceptedException(f"Too many click intercepts! {path=}")
             sleep(1)
         except TimeoutException as e:
             logging.warning(f"Timeout on element {path=}! Trying again")
             tries += 1
             if tries > max_fails:
-                raise TimeoutException("Too many timeouts!")
+                raise TimeoutException(f"Too many timeouts! {path=}")
             sleep(1)
 
 
@@ -132,19 +133,19 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=MAX_
             logging.warning(f"Element {path=} was stale! Trying again")
             tries += 1
             if tries > max_fails:
-                raise StaleElementReferenceException("Too many stale elements!")
+                raise StaleElementReferenceException(f"Too many stale elements! {path=}")
             sleep(1)
         except ElementClickInterceptedException as e:
             logging.warning(f"Click on element {path=} was intercepted! Trying again")
             tries += 1
             if tries > max_fails:
-                raise ElementClickInterceptedException("Too many click intercepts!")
+                raise ElementClickInterceptedException(f"Too many click intercepts! {path=}")
             sleep(1)
         except TimeoutException as e:
             logging.warning(f"Timeout on element {path=}! Trying again")
             tries += 1
             if tries > max_fails:
-                raise TimeoutException("Too many timeouts!")
+                raise TimeoutException(f"Too many timeouts! {path=}")
             sleep(1)
 
 
@@ -155,12 +156,9 @@ class TestKjell:
     def test_search_bar(self, driver):
         search_bar = wait_and_get_element(driver, '//form/div[1]/input')
         search_bar.send_keys("test", Keys.RETURN)
-
-        # get product from search results
         assert wait_and_get_element(driver, "//h3[contains(., 'Kabeltestare')]")
 
     def test_choose_store(self, driver):
-        # click_menu_retry(driver)
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
         wait_and_click(driver, "//div[@data-test-id='my-store-button']", center_scroll=False)  # choose store
 
@@ -168,9 +166,9 @@ class TestKjell:
         wait_and_click(driver, "//button[@data-test-id='choose-store-button']", center_scroll=False)  # accept store
         # ec.invisibility_of_element_located((By.XPATH, "//div[@class='m5']"))  # wait for menu to closed
 
+        # sleep needed? seems to click but not registering if there is no sleep
         sleep(1)
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
-        # click_menu_retry(driver)
         # check chosen store
         # TODO this element cant be found often, menu button fail to press? without sleep its even worse...
         chosen_store = wait_and_get_element(driver,
@@ -182,7 +180,8 @@ class TestKjell:
     def test_search_exact(self, driver):
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("\"test\"", Keys.RETURN)
-        wait_and_get_element(driver, "//div[2]/div/div[1]/div[1]/div[2]")  # wait for element on left side to load
+        # wait for element on left side to load
+        wait_and_get_element(driver, "//div[2]/div[1]/div/div[@data-test-id='product-card']")
         products_list = [e.text for e in driver.find_elements(By.XPATH, "//h3")]
         assert "test" in products_list[0].lower()
 
