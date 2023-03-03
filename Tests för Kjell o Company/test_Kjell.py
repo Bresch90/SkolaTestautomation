@@ -77,8 +77,7 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=MAX_FAILS)
             if center_scroll:
                 active_driver.execute_script(f"window.scrollBy(0, -650);")  # center on screen after scroll.
 
-            # added javascript click as last try, haven't seen it work yet though...
-            # seems like clicking is not the problem, waiting for element to be clickable/finding is the problem.
+            # Helps when in mobile layout and chat box obscures
             if tries > max_fails-1:
                 active_driver.execute_script(f"arguments[0].click();",
                                              WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
@@ -223,12 +222,12 @@ class TestKjell:
             wait_and_click(driver, f"//div[2]/div[1]/div/div[{pos}][@data-test-id='product-card']/a")
             logging.info(f"going on {pos=}")
             # wait for product page to load
-            WebDriverWait(driver, timeout=30).until(
-                lambda d:
-                    d.find_elements(By.XPATH, "//button[@id='clickAndCollect']")
-                    or d.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]")
-                    or d.find_elements(By.XPATH, "//*[@id='addToCart']")
-            )
+            # WebDriverWait(driver, timeout=30).until(
+            #     lambda d:
+            #         d.find_elements(By.XPATH, "//button[@id='clickAndCollect']")
+            #         or d.find_elements(By.XPATH, "//button[contains(text(), 'Bevaka')]")
+            #         or d.find_elements(By.XPATH, "//*[@id='addToCart']")
+            # )
             name = wait_and_get_element(driver, f"//div[1]/h1").text
             # check if item is out of stock
             if driver.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]"):
@@ -256,12 +255,9 @@ class TestKjell:
             else:
                 products_dict.update({name: price})
             logging.info(f"added {name=} with {price=}")
-
             wait_and_click(driver, "//*[@id='addToCart']")  # add item to cart
             # wait for checkmark on button
             wait_and_get_element(driver, "//*[@id='addToCart']/span/*[local-name()='svg']")
-            # wait_and_get_element(driver, "//*[@id='addToCart' and @aria-label='[object Object],false,false']")
-            # wait_and_get_element(driver, "//span[contains(., 'Tillagd i din varukorg')]")
             logging.info(f"cart should now be {products_dict.keys()=}")
             driver.back()
 
