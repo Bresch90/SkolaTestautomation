@@ -33,12 +33,12 @@ jobs:
 
       - name: Run Chrome tests
         if: success() || failure()
-        run: pytest -s --tb=short --log-cli-level=INFO --browser=chrome --headless=true ./"Tests för Kjell o Company"/test_Kjell.py
+        run: pytest -s --tb=short --log-cli-level=INFO --browser=chrome --headless=false ./"Tests för Kjell o Company"/test_Kjell.py
 
       - name: Run Firefox tests
         if: success() || failure()
-        run: pytest -s --tb=short --log-cli-level=INFO --browser=firefox --headless=true ./"Tests för Kjell o Company"/test_Kjell.py
+        run: pytest -s --tb=short --log-cli-level=INFO --browser=firefox --headless=false ./"Tests för Kjell o Company"/test_Kjell.py
         
       - name: Run Edge tests
         if: success() || failure()
-        run: pytest -s --tb=short --log-cli-level=INFO --browser=edge --headless=true ./"Tests för Kjell o Company"/test_Kjell.py
+        run: pytest -s --tb=short --log-cli-level=INFO --browser=edge --headless=false ./"Tests för Kjell o Company"/test_Kjell.py
