@@ -75,7 +75,7 @@ def wait_and_click(active_driver, path, center_scroll=True, max_fails=DEFAULT_MA
             if center_scroll:
                 active_driver.execute_script(f"window.scrollBy(0, {scroll_value});")  # center on screen after scroll.
                 # variate scroll back, see if that fixes "ImBox chat launcher" intercepts
-                scroll_value += 50
+                # scroll_value += 50
             # ActionChains(active_driver).move_to_element(element).click().perform()  # works without firefox
             if tries > max_fails-1:
                 WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
@@ -121,7 +121,7 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=DEFA
             if center_scroll:
                 active_driver.execute_script(f"window.scrollBy(0, {scroll_value});")  # center on screen after scroll.
                 # variate scroll back, see if that fixes being flaky
-                scroll_value += 50
+                # scroll_value += 50
             # need to fetch element again since the page destroys some elements when scrolling.
             # this fixed the assertion error with getting name being different on some browsers?
             return WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
@@ -181,8 +181,8 @@ class TestKjell:
         wait_and_click(driver, "//li[contains(.,'Kalmar')]")  # select store
         wait_and_click(driver, "//button[@data-test-id='choose-store-button']", center_scroll=False)  # accept store
         # ec.invisibility_of_element_located((By.XPATH, "//div[@class='m5']"))  # wait for menu to closed
-
         # driver.execute_script("arguments[0].click()", driver.find_element(By.XPATH, "//button[@data-test-id='main-menu-button']"))
+
         sleep(1)
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
         # click_menu_retry(driver)
