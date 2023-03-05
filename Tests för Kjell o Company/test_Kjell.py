@@ -220,12 +220,12 @@ class TestKjell:
             wait_and_click(driver, f"//div[2]/div[1]/div/div[{pos}][@data-test-id='product-card']/a")
             logging.info(f"going on {pos=}")
             # wait for product page to load, gets wrong product name if it doesn't wait.
-            WebDriverWait(driver, timeout=30).until(
-                lambda d:
-                    d.find_elements(By.XPATH, "//button[@id='clickAndCollect']")
-                    or d.find_elements(By.XPATH, "//button[contains(text(), 'Bevaka')]")
-                    or d.find_elements(By.XPATH, "//*[@id='addToCart']")
-            )
+            # changed to wait for clickable to try solving Jenkins edge flakiness
+            WebDriverWait(driver, timeout=30).until(ec.any_of(
+                ec.element_to_be_clickable((By.XPATH, "//button[@id='clickAndCollect']")),
+                ec.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Bevaka')]")),
+                ec.element_to_be_clickable((By.XPATH, "//*[@id='addToCart']"))
+            ))
             name = wait_and_get_element(driver, f"//div[1]/h1").text
             # check if item is out of stock
             if driver.find_elements(By.XPATH, "//button[contains(., 'Bevaka')]"):
