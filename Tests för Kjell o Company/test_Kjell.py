@@ -122,8 +122,6 @@ def wait_and_get_element(active_driver, path, center_scroll=True, max_fails=MAX_
             active_driver.execute_script("arguments[0].scrollIntoView(true);", element)
             if center_scroll:
                 active_driver.execute_script(f"window.scrollBy(0, -650);")  # center on screen after scroll.
-                # variate scroll back, see if that fixes being flaky
-                # scroll_value += 50
             # need to fetch element again since the page destroys some elements when scrolling.
             # this fixed the assertion error with getting name being different on some browsers?
             return WebDriverWait(active_driver, timeout=MAX_TIMEOUT).until(
@@ -169,7 +167,7 @@ class TestKjell:
         sleep(1)
         wait_and_click(driver, "//button[@data-test-id='main-menu-button']", center_scroll=False)  # menu button
         # check chosen store
-        # TODO this element cant be found often, menu button fail to press? without sleep its even worse...
+        # TODO this element cant be found often, menu button fail to press? without sleep it's even worse...
         chosen_store = wait_and_get_element(driver,
                                             "//div[@data-test-id='my-store-button']/div/div[2]", center_scroll=False)
         assert "kalmar" in chosen_store.text.lower()
@@ -238,7 +236,7 @@ class TestKjell:
             price = float(wait_and_get_element(driver,
                                                f'//div/span/span')
                           .text.replace(':-', '').replace(' ', ''))  # some contain ":-" and spaces
-            # looking for both sup on mobile layout and normal
+            # looking for both sup on mobile layout and normal. If it has one, it has cents.
             if driver.find_elements(By.XPATH, f"//section[1]/div[2]/div[2]/span/span/sup") or \
                     driver.find_elements(By.XPATH, f"//div[3]/span/span/sup") or \
                     driver.find_elements(By.XPATH,
