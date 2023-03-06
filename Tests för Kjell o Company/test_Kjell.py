@@ -256,7 +256,7 @@ class TestKjell:
             wait_and_click(driver, "//*[@id='addToCart']")  # add item to cart
             # wait for checkmark on button
             wait_and_get_element(driver, "//*[@id='addToCart']/span/*[local-name()='svg']")
-            logging.info(f"cart should now be {products_dict.keys()=}")
+            logging.info(f"cart should now be {products_dict.keys()}")
             driver.back()
 
         # open cart
@@ -272,7 +272,7 @@ class TestKjell:
         wait_and_get_element(driver, "//div[2]/div/ul/li/div[1]/div[1]/div/a")  # make sure elements are in focus
         items_in_cart = [e.text for e in driver.find_elements(By.XPATH, "//div[2]/div/ul/li/div[1]/div[1]/div/a")]
         logging.info(f"{items_in_cart=}")
-        logging.info(f"{products_dict.keys()=}")
+        logging.info(f"{products_dict.keys()}")
         logging.info(f"{products_dict}")
 
         # checking each item in list if they match what is in the cart
