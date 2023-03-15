@@ -278,4 +278,5 @@ class TestKjell:
         # checking each item in list if they match what is in the cart
         for item in products_dict.keys():
             assert item in items_in_cart
+        # check that price is the same for sum(products) and total in cart
         assert f"{sum(products_dict.values()):.1f}" == f"{total_cart_site:.1f}"  # string to format floating point error

@@ -43,6 +43,11 @@ pipeline {
                     @echo Edge tests done!
                      """
                 }
+            }
+        }
+
+        stage ('Cleaning Workspace'){
+            steps {
                 cleanWs()
             }
         }
