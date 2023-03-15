@@ -2,13 +2,6 @@
 pipeline {
     agent any
     stages {
-        stage ('SkolaTestAutomation - Checkout') {
-            steps{
-                checkout([$class: 'GitSCM', branches: [[name: '**']], doGenerateSubmoduleConfigurations: false,
-                 extensions: [], submoduleCfg: [],
-                  userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/Bresch90/SkolaTestautomation.git']]])
-            }
-        }
 
         stage ('SkolaTestAutomation - Chrome tests') {
             steps{
