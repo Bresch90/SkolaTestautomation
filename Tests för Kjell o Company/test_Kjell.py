@@ -275,7 +275,7 @@ class TestKjell:
         logging.info(f"{items_in_cart=}")
         logging.info(f"{products_dict.keys()}")
         logging.info(f"{products_dict}")
-
+        # Demo
         # checking each item in list if they match what is in the cart
         for item in products_dict.keys():
             assert item in items_in_cart
