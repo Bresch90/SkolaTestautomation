@@ -207,8 +207,9 @@ class TestKjell:
 
     def test_add_to_cart(self, driver):
         products_dict = {}
-        product_positions = [2, 3, 2, 5, 6, 4, 7, 8, 22, 22, 15, 12, 14, 13, 11, 1]
-        # product_positions = [1, 2, 1, 19, 30, 25, 1, 3, 18, 18] # for testing different items
+        product_positions = [1, 2, 19, 19, 30]
+        # product_positions = [1, 2, 1, 19, 30, 25, 1, 3, 18, 18] # for testing different items.
+        # product_positions = [2, 3, 2, 5, 6, 4, 7, 8, 22, 22, 15, 12, 14, 13, 11, 1]  # Another list.
 
         search_bar = driver.find_element(By.XPATH, '//form/div[1]/input')
         search_bar.send_keys("test", Keys.RETURN)
